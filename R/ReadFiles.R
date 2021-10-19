@@ -6,7 +6,6 @@
 #' @export
 ReadET <- function(ET_file) {
   ET.df <- read_lines(ET_file) %>%
-    str_replace_all(" +", " ") %>%
     .[!str_detect(., "%")] %>%
     read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
                       vari.n = 10, vari = 22, rho = 10, coverage = 10),
