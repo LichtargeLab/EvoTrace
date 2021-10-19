@@ -8,10 +8,9 @@ ReadET <- function(ET_file) {
   ET.df <- read_lines(ET_file) %>%
     str_replace_all(" +", " ") %>%
     .[!str_detect(., "%")] %>%
-    read_delim(col_names = c("align.num", "POS", "AA", "rank","vari.n",
-                             "vari", "rho", "coverage"),
-               col_types = "ndcddcdd",
-               delim = " ")
+    read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
+                      vari.n = 10, vari = 22, rho = 10, coverage = 10),
+             col_types = "ndcddcdd")
   return(ET.df)
 }
 
@@ -26,7 +25,7 @@ ReadET <- function(ET_file) {
 #' @description Read fasta file
 #' @export
 ReadFasta <- function(fasta_file, output_type = c("vector", "df")) {
-  all.seq <- Biostrings::readAAStringSet(glue("{new.dir}/{gisaid.fasta}"))
+  all.seq <- Biostrings::readAAStringSet(fasta_file)
   if (output_type == "vector") {
     output <- as.character(all.seq)
     names(output) <- names(all.seq)
