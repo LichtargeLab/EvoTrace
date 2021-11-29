@@ -13,7 +13,7 @@
 #' @export
 CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE) {
   pdb.df <- GetCoordinates(pdb_file = pdb_file, chain = chain, CA_only = TRUE) %>%
-    select(AA.pdb = AA, POS.pdb = POS)
+    select(AA.pdb = AA, AA.POS.pdb = POS)
   pdb.str <- pdb.df$AA.pdb %>%
     paste0(., collapse = "")
 
@@ -21,8 +21,8 @@ CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE) {
                                              substitutionMatrix = "BLOSUM62",
                                              gapOpening = 11, gapExtension = 1)
 
-  align.df <- c(alignedPattern(alignment),
-                alignedSubject(alignment)) %>%
+  align.df <- c(Biostrings::alignedPattern(alignment),
+                Biostrings::alignedSubject(alignment)) %>%
     as.character() %>%
     str_split(., pattern = "", simplify = TRUE) %>%
     t() %>%

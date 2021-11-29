@@ -1,14 +1,12 @@
 #' @export
-PymolColorChainByResidue <- function(chain, position, coverage, color_type = c("ET", "red_white", "red_white_blue")) {
-  if (length(unique(c(length(position),
-                      length(coverage)))) != 1) {
-    return("Position and coverage should have same length")
+PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
+  if(is.null(object)) {
+    object_cmd <- ""
+  } else {
+    object_cmd <- paste0(object, " and ")
   }
-  colorRange <- SelectColor(color_type = color_type)
-  workdf <- tibble(chain, position, coverage) %>%
-    mutate(coverage = 100*coverage,
-           color = colorRange[ceiling(coverage)]) %>%
-    mutate(pymol_cmd = glue::glue("color {color}, chain {chain} and resi {position}"))
+  workdf <- tibble(chain, position, color) %>%
+    mutate(pymol_cmd = glue::glue("color {color}, {object_cmd}chain {chain} and resi {position}"))
   return(workdf$pymol_cmd)
 }
 
@@ -73,7 +71,7 @@ PymolColorPairs <- function(chain1, position1,
                             color_type = c("ET", "red_white", "red_white_blue"),
                             group_name = "pairs",
                             pair_coverage_cutoff = NULL) {
-  colorRange <- SelectColor(color_type = color_type)
+  colorRange <- SelectColor(color_type = color_type, prefix = "0x")
   if (is.null(pair_coverage_cutoff)) {
     pair_coverage_cutoff <- max(pair_coverage)
   }
