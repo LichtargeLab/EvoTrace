@@ -5,14 +5,18 @@
 #' @description Read legacy ET file and output a tibble
 #' @export
 ReadET <- function(ET_file) {
-  ET.df <- read_lines(ET_file) %>%
-    .[!str_detect(., "%")] %>%
-    read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
-                      vari.n = 10, vari = 22, rho = 10, coverage = 10),
-             col_types = "ndcddcdd")
-  return(ET.df)
+  ET.lines <- read_lines(ET_file)
+  if(length(ET.lines) == 0) {
+    return(NA)
+  } else {
+    ET.df <- ET.lines %>%
+      .[!str_detect(., "%")] %>%
+      read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
+                        vari.n = 10, vari = 22, rho = 10, coverage = 10),
+               col_types = "ndcddcdd")
+    return(ET.df)
+  }
 }
-
 
 #' Read fasta file
 #'
