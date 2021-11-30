@@ -11,6 +11,7 @@ ReadET <- function(ET_file) {
   } else {
     ET.df <- ET.lines %>%
       .[!str_detect(., "%")] %>%
+      I(.) %>%
       read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
                         vari.n = 10, vari = 22, rho = 10, coverage = 10),
                col_types = "ndcddcdd")
