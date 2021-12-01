@@ -50,7 +50,8 @@ CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE) {
   align.df$data[[1]]$AA.POS.seq <- 1:nrow(align.df$data[[1]])
   align.df <- align.df %>%
     unnest(cols = c(data)) %>%
-    ungroup()
+    ungroup() %>%
+    arrange(align.POS)
   if (pos.only == TRUE) {
     align.df <- select(align.df, AA.POS.pdb, AA.POS.seq) %>%
       filter(!is.na(AA.POS.pdb), !is.na(AA.POS.seq))
