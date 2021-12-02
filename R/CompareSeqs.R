@@ -13,7 +13,8 @@
 #' @export
 CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE) {
   pdb.df <- GetCoordinates(pdb_file = pdb_file, chain = chain, CA_only = TRUE) %>%
-    select(AA.pdb = AA, AA.POS.pdb = POS)
+    select(AA.pdb = AA, AA.POS.pdb = POS) %>%
+    arrange(AA.POS.pdb)
   pdb.str <- pdb.df$AA.pdb %>%
     paste0(., collapse = "")
 
