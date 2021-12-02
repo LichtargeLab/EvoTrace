@@ -15,9 +15,9 @@ GetInterface(
 \arguments{
 \item{pdb_file}{path to pdb file}
 
-\item{chain1}{the first protein chain}
+\item{chain1}{the first chain}
 
-\item{chain2}{the second protein chain}
+\item{chain2}{the second chain}
 
 \item{dist_cutoff}{the distance cutoff that consider two atoms are adjacent}
 

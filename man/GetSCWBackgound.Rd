@@ -4,7 +4,7 @@
 \alias{GetSCWBackgound}
 \title{Compute the background stats for SCW z score calculation}
 \usage{
-GetSCWBackgound(pdb_file, chain, dist_cutoff = 4)
+GetSCWBackgound(pdb_file, chain, dist_cutoff = 4, resi = NULL)
 }
 \arguments{
 \item{pdb_file}{path to pdb file}
@@ -12,6 +12,9 @@ GetSCWBackgound(pdb_file, chain, dist_cutoff = 4)
 \item{chain}{the protein chain SCW z score is calculated on}
 
 \item{dist_cutoff}{the distance cutoff that consider two atoms are adjacent}
+
+\item{resi}{a vector of residues numbers that are included in SCW bg calculation.
+If NULL, then all residues in that chain is used.}
 }
 \value{
 a list with parameters that are needed for SCW z scores calculation
