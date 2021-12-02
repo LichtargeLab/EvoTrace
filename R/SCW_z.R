@@ -158,34 +158,36 @@ ComputeSCWzscore_list <- function(SCW_background, resi_list) {
 #' as input.
 #' @export
 ET_SCWzscore <- function(pdb_file = NULL, chain = NULL, SCW_background = NULL, ET_file,
-                     coverage = 0.3, adjust_gap = FALSE) {
+                         coverage = 0.3, adjust_gap = FALSE) {
   ET <- ReadET(ET_file)
   ET_seq <- paste0(ET$AA, collapse = "")
+  # When pdb file is not provided, use residue numbers in the ET output to map to strucutre,
+  # if pdb file is provided, pdb seq is aligned with ET seq to map the ET top residues to
+  # structure.
+  if (!is.null(pdb_file)) {
+    resi_map <- CompareSeqs(pdb_file, chain, ET_seq, pos.only = TRUE)
+    resi_select <- ET %>%
+      left_join(dplyr::rename(resi_map, POS = AA.POS.seq, pdb.POS = AA.POS.pdb), by = "POS")
+  } else {
+    resi_select <- ET %>%
+      mutate(pdb.POS = POS)
+  }
   if (!is.null(SCW_background)) {
     scw_bg <- SCW_background
   } else {
     if (is.null(pdb_file) | is.null(chain)) {
       stop("Provide either pdb_file/chain or SCW_background")
     }
-    resi_map <- CompareSeqs(pdb_file, chain, ET_seq, pos.only = TRUE)
     if (adjust_gap == TRUE) {
       scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain, resi = resi_map$AA.POS.pdb)
     } else {
       scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain)
     }
   }
-  # When pdb file is not provided, use residue numbers in the ET output to map to strucutre,
-  # if pdb file is provided, pdb seq is aligned with ET seq to map the ET top residues to
-  # structure.
-  if (!is.null(pdb_file)) {
-    resi_select <- ET %>%
-      left_join(rename(resi_map, POS = AA.POS.seq, pdb.POS = AA.POS.pdb), by = "POS")
-  } else {
-    resi_select <- ET %>%
-      mutate(pdb.POS = POS)
-  }
+
   resi_select <- resi_select %>%
     mutate(cov = rank(rho, ties.method = "max")/n()) %>%
+    select(-coverage) %>%
     filter(cov <= coverage) %>%
     filter(!is.na(pdb.POS)) %>%
     .$pdb.POS
