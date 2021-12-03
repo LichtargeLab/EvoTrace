@@ -23,7 +23,12 @@ GetCoordinates <- function(pdb_file, chain, CA_only = TRUE) {
     output <- filter(output, X4 == "CA")
   }
   output <- output %>%
-    select(chain = X8, POS = X9, AA = X6, ATOM = X4, ATOM_id = X2, x = X12, y = X13, z = X14) %>%
+    select(chain = X8, POS = X9, AA = X6, ATOM = X4, ATOM_id = X2, x = X12, y = X13, z = X14, X15) %>%
+    group_by(chain, POS, AA, ATOM) %>%
+    # If there are 2 conformation for a residue, the dominant one is picked
+    filter(X15 == max(X15)) %>%
+    select(-X15) %>%
+    ungroup() %>%
     mutate(AA = AA3to1(AA))
   return(output)
 }
