@@ -39,7 +39,10 @@ PymolSaveScene <- function(scene_name, color = 1, view = 0, active = 0, rep = 0,
 }
 
 #' @export
-PymolExecuteAndSave <- function(pymol_cmd, output_file = NULL, pymol_cmd_output = NULL) {
+PymolExecuteAndSave <- function(pymol_cmd, output_file = NULL, pymol_cmd_output = NULL, pymol_path = NULL) {
+  if(is.null(pymol_path)) {
+    pymol_path <- "pymol"
+  }
   if(is.null(output_file)) {
     pymol_cmd <- c(pymol_cmd)
   } else {
@@ -49,14 +52,14 @@ PymolExecuteAndSave <- function(pymol_cmd, output_file = NULL, pymol_cmd_output 
   if(is.null(pymol_cmd_output)) {
     temp_pml <- tempfile("pymol", fileext = ".pml")
     write_lines(pymol_cmd, file = temp_pml)
-    system(glue::glue("pymol -c {temp_pml}"))
+    system(glue::glue("{pymol_path} -c {temp_pml}"))
     file.remove(temp_pml)
     rm(temp_pml)
     return("PSE file written")
   } else {
     if(str_sub(pymol_cmd_output, -4, -1) == ".pml") {
       write_lines(pymol_cmd, file = pymol_cmd_output)
-      system(glue::glue("pymol -c {pymol_cmd_output}"))
+      system(glue::glue("{pymol_path} -c {pymol_cmd_output}"))
       return("PSE file written")
     } else {
       return("pymol_cmd_output should end with .pml")
