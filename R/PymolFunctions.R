@@ -54,7 +54,7 @@ PymolExecuteAndSave <- function(pymol_cmd, output_file = NULL, pymol_cmd_output 
     rm(temp_pml)
     return("PSE file written")
   } else {
-    if(str_sub(pymol_cmd_output, -3, -1) == ".pml") {
+    if(str_sub(pymol_cmd_output, -4, -1) == ".pml") {
       write_lines(pymol_cmd, file = pymol_cmd_output)
       system(glue::glue("pymol -c {pymol_cmd_output}"))
       return("PSE file written")
