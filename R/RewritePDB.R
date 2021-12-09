@@ -25,8 +25,9 @@ RewritePDB <- function(pdb_file, chain, linear_seq, fix_positions = TRUE,
 
   atom_data <- pdb[str_detect(pdb_row_type, "ATOM  |HETATM|TER   ")] %>%
     read_fwf(., col_positions = fwf_widths(widths = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2)),
-             col_types = "cdccccccdccdddddcccc",
-             trim_ws = TRUE)
+             trim_ws = FALSE) %>%
+    # Convert AA positions into numberic
+    mutate(X9 = as.numeric(X9))
 
   other_chains <- atom_data %>%
     filter(X8 != chain)
@@ -46,13 +47,14 @@ RewritePDB <- function(pdb_file, chain, linear_seq, fix_positions = TRUE,
   if(keep_other_chains == TRUE) {
     output <- bind_rows(mapped_chain, other_chains) %>%
       arrange(X2) %>%
-      filter(X6 != "HOH") %>%
-      as.data.frame()
+      filter(X6 != "HOH")
   } else {
-    output <- mapped_chain %>%
-      as.data.frame()
+    output <- mapped_chain
   }
-
+  # Pad white space to the left of residue number to make it to width of 4
+  output <- output %>%
+    mutate(X9 = str_pad(X9, width = 4, side = "left", pad = " ")) %>%
+    as.data.frame()
 
   gdata::write.fwf(output, file = output_file, append = FALSE, width = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2),
                    colnames = FALSE, justify="left", sep = "")
