@@ -18,4 +18,5 @@ Depends:
     tidyr
 Imports: 
     glue,
-    Biostrings
+    Biostrings,
+    gdata
