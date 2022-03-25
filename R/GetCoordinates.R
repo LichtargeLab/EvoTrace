@@ -12,6 +12,7 @@ GetCoordinates <- function(pdb_file, chain, CA_only = TRUE) {
   pdb <- read_lines(pdb_file)
   pdb_row_type <- str_sub(pdb, 1, 6)
   output <- pdb[str_detect(pdb_row_type, "ATOM  |HETATM")] %>%
+    I(.) %>%
     read_fwf(., col_positions = fwf_widths(widths = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2)),
              col_types = "cdccccccdccdddddcccc",
              trim_ws = TRUE) %>%
