@@ -91,7 +91,7 @@ PymolColorChainSingleColor <- function(chain = NULL, color = "white") {
 #' @export
 
 PymolSaveScene <- function(scene_name, color = 1, view = 0, active = 0, rep = 0, frame = 0, animate = 0) {
-  output <- glue::glue("scene {scene_name}, store, color = {color}, view = {view}, active = 0, rep = {rep}, frame = {frame}, animate = {animate}")
+  output <- glue::glue("scene {scene_name}, store, color = {color}, view = {view}, active = {active}, rep = {rep}, frame = {frame}, animate = {animate}")
   return(output)
 }
 
