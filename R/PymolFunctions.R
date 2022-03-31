@@ -139,6 +139,29 @@ PymolExecuteAndSave <- function(pymol_cmd, output_file = NULL, pymol_cmd_output 
 #' @export
 PymolColorPairs <- function(chain1, position1,
                             chain2, position2,
+                            pair_color,
+                            group_name = "pairs") {
+  workdf <- tibble(chain1, position1,
+                   chain2, position2,
+                   color = pair_color) %>%
+    mutate(pair_label = glue::glue("{group_name}_{chain1}_{position1}_{chain2}_{position2}")) %>%
+    mutate(pymol_cmd1 = glue::glue("distance {pair_label}, chain {chain1} and resi {position1} and name CA, chain {chain2} and resi {position2} and name CA"),
+           pymol_cmd2 = glue::glue("set dash_color, {color}, {pair_label}"),
+           pymol_cmd3 = glue::glue("group {group_name}, {pair_label}"))
+  output_cmd <- c(
+    workdf$pymol_cmd1,
+    workdf$pymol_cmd2,
+    workdf$pymol_cmd3,
+    "hide labels",
+    "set dash_gap, 0.0",
+    "set dash_radius, 0.1"
+  )
+  return(output_cmd)
+}
+
+#' @export
+PymolColorPairs_2 <- function(chain1, position1,
+                            chain2, position2,
                             pair_coverage,
                             color_type = c("ET", "red_white", "red_white_blue"),
                             group_name = "pairs",
