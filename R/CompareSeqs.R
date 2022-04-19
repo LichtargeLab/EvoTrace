@@ -5,22 +5,30 @@
 #' @param seq Character string. Linear sequence of the protein
 #' @param pos.only If TRUE, then only matched positions between the pdb sequence and
 #' the linear sequence are returned.
+#' @param penalty Gap penalties used for the pairwise alignment.
 #' @return A tibble that contains the matching information of the pdb sequence and
 #' linear sequence.
 #' @description Sequence from pdb_file is extracted and compared (aligned) to linear
 #' sequence. The matching positions in the pdb entry and in the linear sequence are
 #' returned.
 #' @export
-CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE) {
+CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE, penalty = c("blastp", "pyETv")) {
   pdb.df <- GetCoordinates(pdb_file = pdb_file, chain = chain, CA_only = TRUE) %>%
     select(AA.pdb = AA, AA.POS.pdb = POS) %>%
     arrange(AA.POS.pdb)
   pdb.str <- pdb.df$AA.pdb %>%
     paste0(., collapse = "")
-
+  penalty <- match.arg(penalty)
+  if(penalty == "blastp") {
+    gap.open = 11
+    gap.extend = 1
+  } else {
+    gap.open = 10
+    gap.extend = 0.5
+  }
   alignment <- Biostrings::pairwiseAlignment(pattern = pdb.str, subject = seq,
                                              substitutionMatrix = "BLOSUM62",
-                                             gapOpening = 11, gapExtension = 1)
+                                             gapOpening = gap.open, gapExtension = gap.extend)
 
   align.df <- c(Biostrings::alignedPattern(alignment),
                 Biostrings::alignedSubject(alignment)) %>%
