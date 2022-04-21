@@ -24,6 +24,8 @@ RewritePDB(
 with linear sequence positions.}
 
 \item{keep_other_chains}{TRUE or FALSE. Whether other chains are kept.}
+
+\item{output_file}{path to output PDB file}
 }
 \value{
 a messege reporting the output file is written

@@ -4,7 +4,13 @@
 \alias{CompareSeqs}
 \title{Compare protein sequence in a pdb file with linear seq}
 \usage{
-CompareSeqs(pdb_file, chain, seq, pos.only = TRUE)
+CompareSeqs(
+  pdb_file,
+  chain,
+  seq,
+  pos.only = TRUE,
+  penalty = c("blastp", "pyETv")
+)
 }
 \arguments{
 \item{pdb_file}{path to PDB file}
@@ -15,6 +21,8 @@ CompareSeqs(pdb_file, chain, seq, pos.only = TRUE)
 
 \item{pos.only}{If TRUE, then only matched positions between the pdb sequence and
 the linear sequence are returned.}
+
+\item{penalty}{Gap penalties used for the pairwise alignment.}
 }
 \value{
 A tibble that contains the matching information of the pdb sequence and
