@@ -53,11 +53,12 @@ CompareLinearSeqs <- function(seq1, seq2, pos.only = TRUE, penalty = c("blastp",
   align.df <- align.df %>%
     unnest(cols = c(data)) %>%
     ungroup() %>%
-    arrange(align.POS)
+    arrange(align.POS) %>%
+    select(seq1.gap, seq2.gap, seq1.AA.align, seq2.AA.align, align.POS, AA.POS.seq1, AA.POS.seq2)
 
   if (pos.only == TRUE) {
-    align.df <- select(align.df, AA.POS.pdb, AA.POS.seq) %>%
-      filter(!is.na(AA.POS.pdb), !is.na(AA.POS.seq))
+    align.df <- select(align.df, AA.POS.seq1, AA.POS.seq2) %>%
+      filter(!is.na(AA.POS.seq1), !is.na(AA.POS.seq2))
   }
   return(align.df)
 }
