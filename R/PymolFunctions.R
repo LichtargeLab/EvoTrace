@@ -30,7 +30,8 @@ PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
 
 #' Pymol select residues
 #'
-#' @param chain The chain in the pymol session that needs to be selected
+#' @param chain The chain in the pymol session that needs to be selected. Input can
+#' be a vector with all the chains that need to be selected.
 #' @param poistion A numeric vector specifying the residues that needs to be
 #' selected
 #' @return A string vector with pymol commands
@@ -39,10 +40,13 @@ PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
 #' Combine PymolLoadFile and all other pymol cmds with c(), then pipe into PymolExecuteAndSave.
 #' @export
 PymolSelectResidues <- function(chain, position, selection_name) {
-  position_cmd <- paste0("chain ", chain, " & resi ", position, collapse = " OR ")
-  output_cmd <- glue::glue("select {selection_name}, ({position_cmd})")
+  chain_cmd <- paste0("chain ", chain)
+  chain_cmd <- paste0(chain_cmd, collapse = " or ")
+  position_cmd <- paste0(position, collapse = "+")
+  output_cmd <- glue::glue("select {selection_name}, ({chain_cmd}) and resi {position_cmd}")
   return(output_cmd)
 }
+
 
 #' Load pdb/pse file
 #'
