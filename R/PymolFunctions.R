@@ -1,6 +1,7 @@
 #' Pymol color residues in a given chain
 #'
-#' @param chain The chain in the pymol session that needs to be colored
+#' @param chain The chain in the pymol session that needs to be colored. Input can
+#' be a vector with all the chains that need to be colored.
 #' @param poistion A numeric vector specifying the residues that needs to be
 #' colored
 #' @param color A string vector with hex colors specifying the color. Should be
@@ -8,7 +9,7 @@
 #' @param object A given object in the pymol session that needs to be colored. If is
 #' NULL, then all object in the pymol session will be colored.
 #' @return A string vector with pymol commands
-#' @description Produce pymol commands to color residues in a given chain. This function should
+#' @description Produce pymol commands to color residues in given chains. This function should
 #' be used in combination with PymolLoadFile and PymolExecuteAndSave. Combine PymolLoadFile and
 #' all other pymol cmds with c(), then pipe into PymolExecuteAndSave.
 #' @export
@@ -18,8 +19,12 @@ PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
   } else {
     object_cmd <- paste0(object, " and ")
   }
-  workdf <- tibble(chain, position, color) %>%
-    mutate(pymol_cmd = glue::glue("color {color}, {object_cmd}chain {chain} and resi {position}"))
+  chain_cmd <- paste0("chain ", chain)
+  chain_cmd <- paste0(chain_cmd, collapse = " or ")
+  workdf <- tibble(position, color) %>%
+    group_by(color) %>%
+    summarize(position = paste0(position, collapse = "+")) %>%
+    mutate(pymol_cmd = glue::glue("color {color}, {object_cmd}({chain_cmd}) and resi {position}"))
   return(workdf$pymol_cmd)
 }
 
