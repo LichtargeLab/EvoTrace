@@ -7,7 +7,8 @@
 PymolColorChainByResidue(chain, position, color, object = NULL)
 }
 \arguments{
-\item{chain}{The chain in the pymol session that needs to be colored}
+\item{chain}{The chain in the pymol session that needs to be colored. Input can
+be a vector with all the chains that need to be colored.}
 
 \item{color}{A string vector with hex colors specifying the color. Should be
 equal length of position. Color format "0xFFFFFF".}
@@ -22,7 +23,7 @@ colored}
 A string vector with pymol commands
 }
 \description{
-Produce pymol commands to color residues in a given chain. This function should
+Produce pymol commands to color residues in given chains. This function should
 be used in combination with PymolLoadFile and PymolExecuteAndSave. Combine PymolLoadFile and
 all other pymol cmds with c(), then pipe into PymolExecuteAndSave.
 }

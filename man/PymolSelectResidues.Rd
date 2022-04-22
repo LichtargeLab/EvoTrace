@@ -7,7 +7,8 @@
 PymolSelectResidues(chain, position, selection_name)
 }
 \arguments{
-\item{chain}{The chain in the pymol session that needs to be selected}
+\item{chain}{The chain in the pymol session that needs to be selected. Input can
+be a vector with all the chains that need to be selected.}
 
 \item{poistion}{A numeric vector specifying the residues that needs to be
 selected}
