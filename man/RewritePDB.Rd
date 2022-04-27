@@ -6,7 +6,7 @@
 \usage{
 RewritePDB(
   pdb_file,
-  chain,
+  chains,
   linear_seq,
   fix_positions = TRUE,
   keep_other_chains = TRUE,
@@ -16,7 +16,7 @@ RewritePDB(
 \arguments{
 \item{pdb_file}{path to PDB file}
 
-\item{chain}{A character. Chain that needs to be rewritten}
+\item{chains}{A character vector. Chains that need to be rewritten.}
 
 \item{linear_seq}{A character. The linear sequence.}
 
@@ -28,12 +28,12 @@ with linear sequence positions.}
 \item{output_file}{path to output PDB file}
 }
 \value{
-a messege reporting the output file is written
+a message reporting the output file is written
 }
 \description{
 The PDB files are often messy. The sequences positions might not match the linear
 sequence positions. The pdb file might contain insertions, like His tag. This function reads the
-squence in PDB file and aligns it with the linear sequence. Any positions in the pdb file that
+sequence in PDB file and aligns it with the linear sequence. Any positions in the pdb file that
 don't align to the linear sequence will be removed. The position number can be rewritten to match
 linear positions. Water molecules are also removed. Only coordinates fields are kept in the output
 pdb file.
