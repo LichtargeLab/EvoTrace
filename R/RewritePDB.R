@@ -24,7 +24,8 @@ RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
   atom_data <- pdb[str_detect(pdb_row_type, "ATOM  |HETATM|TER   ")] %>%
     I() %>%
     read_fwf(., col_positions = fwf_widths(widths = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2)),
-             trim_ws = FALSE) %>%
+             trim_ws = FALSE,
+             show_col_types = FALSE) %>%
     # Convert AA positions into numeric
     mutate(X9 = as.numeric(X9))
 
