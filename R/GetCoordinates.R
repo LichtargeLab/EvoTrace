@@ -3,12 +3,15 @@
 #' @param pdb_file path to PDB file
 #' @param chain Character string. Chains that needs to be extracted
 #' @param CA_only Logic. Whether only C alpha are extracted
+#' @param remove_insertions Logic. Some residues are labeled as insertions in the pdb
+#' file and they have the same POS index as the residue that they insert after. If True,
+#' these insertion residues are removed.
 #' @return A tibble that contains chain, POS (AA position), AA, ATOM, ATOM_id, x, y, z
 #' @description Extract coordinates from PDB file. Output will be a tibble
 #' that contains protein chain, AA position, AA type (one letter), atom type,
 #' atom id and coordinates (x, y, z)
 #' @export
-GetCoordinates <- function(pdb_file, chain, CA_only = TRUE) {
+GetCoordinates <- function(pdb_file, chain, CA_only = TRUE, remove_insertions = TRUE) {
   pdb <- read_lines(pdb_file)
   pdb_row_type <- str_sub(pdb, 1, 6)
   output <- pdb[str_detect(pdb_row_type, "ATOM  |HETATM")] %>%
@@ -22,6 +25,9 @@ GetCoordinates <- function(pdb_file, chain, CA_only = TRUE) {
                      "CYS", "TRP", "MSE"))
   if(CA_only == TRUE) {
     output <- filter(output, X4 == "CA")
+  }
+  if(remove_insertions == TRUE) {
+    output <- filter(output, is.na(X10))
   }
   output <- output %>%
     select(chain = X8, POS = X9, AA = X6, ATOM = X4, ATOM_id = X2, x = X12, y = X13, z = X14, X15) %>%

@@ -4,7 +4,7 @@
 \alias{GetCoordinates}
 \title{Extract coordinates from PDB file}
 \usage{
-GetCoordinates(pdb_file, chain, CA_only = TRUE)
+GetCoordinates(pdb_file, chain, CA_only = TRUE, remove_insertions = TRUE)
 }
 \arguments{
 \item{pdb_file}{path to PDB file}
@@ -12,6 +12,10 @@ GetCoordinates(pdb_file, chain, CA_only = TRUE)
 \item{chain}{Character string. Chains that needs to be extracted}
 
 \item{CA_only}{Logic. Whether only C alpha are extracted}
+
+\item{remove_insertions}{Logic. Some residues are labeled as insertions in the pdb
+file and they have the same POS index as the residue that they insert after. If True,
+these insertion residues are removed.}
 }
 \value{
 A tibble that contains chain, POS (AA position), AA, ATOM, ATOM_id, x, y, z
