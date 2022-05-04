@@ -29,11 +29,11 @@ RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
     # Convert AA positions into numeric
     mutate(X9 = as.numeric(X9))
 
-  other_chains <- atom_data %>%
-    filter(!X8 %in% chains)
+  index <- (atom_data$X8 %in% chains) & (atom_data$X1 == "ATOM  ")
+  rewrite_chains <- atom_data[index,]
 
-  rewrite_chains <- atom_data %>%
-    filter(X8 %in% chains)
+  other_chains <- atom_data[!index,]
+
 
   seq_map_list <- lapply(chains, CompareSeqs, pdb_file = pdb_file,
                          seq = linear_seq)
