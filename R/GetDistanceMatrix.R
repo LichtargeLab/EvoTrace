@@ -31,7 +31,8 @@ GetDistanceMatrix <- function(df, output_type = c("df", "matrix")) {
     # mutate(dist = round(dist, 3)) %>%
     group_by(POS_i, POS_j) %>%
     summarize(dist = min(dist)) %>%
-    ungroup()
+    ungroup() %>%
+    arrange(POS_i, POS_j)
   if (output_type == "matrix") {
     resn <- length(unique(df$POS))
     output <- workdf %>%
