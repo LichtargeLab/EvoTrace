@@ -22,6 +22,7 @@ GetDistanceMatrix <- function(df, output_type = c("df", "matrix")) {
   #   output_type: "df" or "matrix. The df form display all pairwise distance
   #   between two residues
   # output: tibble or matrix
+  output_type <- match.arg(output_type)
   df_i <- df %>%
     select(POS_i = POS, ATOM_i = ATOM, x_i = x, y_i = y, z_i = z)
   df_j <- df %>%
