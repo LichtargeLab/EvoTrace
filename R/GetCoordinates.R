@@ -22,7 +22,8 @@ GetCoordinates <- function(pdb_file, chain, CA_only = TRUE, remove_insertions = 
     filter(X8 %in% chain) %>%
     filter(X6 %in% c("HIS", "PRO", "GLU", "THR", "LEU", "VAL", "LYS", "ASP", "ALA",
                      "GLN", "GLY", "ARG", "TYR", "ILE", "ASN", "SER", "PHE", "MET",
-                     "CYS", "TRP", "MSE"))
+                     "CYS", "TRP", "MSE")) %>%
+    filter(X1 == "ATOM"|X6 == "MSE")
   if(CA_only == TRUE) {
     output <- filter(output, X4 == "CA")
   }
