@@ -30,7 +30,7 @@ RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
     mutate(X9 = as.numeric(X9))
 
   # hard code MSE from HETATM to ATOM
-  index_MSE <- atom_data$X6 == "MSE"
+  index_MSE <- (atom_data$X6 == "MSE") & (atom_data$X1 == "HETATM")
   atom_data$X1[index_MSE] = "ATOM  "
 
   index <- (atom_data$X8 %in% chains)
