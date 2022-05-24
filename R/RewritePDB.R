@@ -17,7 +17,7 @@
 #' @export
 
 RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
-                       keep_other_chains = TRUE, output_file) {
+                           keep_other_chains = TRUE, output_file) {
   pdb <- read_lines(pdb_file)
   pdb_row_type <- str_sub(pdb, 1, 6)
 
@@ -29,7 +29,11 @@ RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
     # Convert AA positions into numeric
     mutate(X9 = as.numeric(X9))
 
-  index <- (atom_data$X8 %in% chains) & (atom_data$X1 == "ATOM  ")
+  # hard code MSE from HETATM to ATOM
+  index_MSE <- atom_data$X6 == "MSE"
+  atom_data$X1[index_MSE] = "ATOM  "
+
+  index <- (atom_data$X8 %in% chains)
   rewrite_chains <- atom_data[index,]
 
   other_chains <- atom_data[!index,]
@@ -43,15 +47,25 @@ RewritePDB <- function(pdb_file, chains, linear_seq, fix_positions = TRUE,
                        seq_map) {
     ignore_chains <- filter(rewrite_chains, X8 != chain_to_fix)
     working_chain <- filter(rewrite_chains, X8 == chain_to_fix) %>%
-      filter(X9 %in% seq_map$AA.POS.pdb)
+      filter(X9 %in% seq_map$AA.POS.pdb) %>%
+      filter(X1 == "ATOM  ")
+    hetatm <- filter(rewrite_chains, X8 == chain_to_fix) %>%
+      filter(X9 %in% seq_map$AA.POS.pdb) %>%
+      filter(X1 == "HETATM")
     if(fix_positions == TRUE) {
       working_chain <- working_chain %>%
         left_join(seq_map, by = c("X9" = "AA.POS.pdb")) %>%
         mutate(X9 = AA.POS.seq) %>%
         filter(!is.na(X9)) %>%
         select(-AA.POS.seq)
+      while (length(intersect(working_chain$X9, hetatm$X9)) > 0) {
+        # After fixing positions, residues in the protein might overlap
+        # with hetero atoms. In this case, shift hetro atoms residue
+        # number for 1000.
+        hetatm$X9 <- hetatm$X9 + 1000
+      }
     }
-    output <- bind_rows(working_chain, ignore_chains) %>%
+    output <- bind_rows(working_chain, hetatm, ignore_chains) %>%
       arrange(X2)
     return(output)
   }
