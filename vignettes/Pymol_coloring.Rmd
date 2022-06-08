@@ -111,3 +111,6 @@ Execute Pymol commands and generate pymol session.
 ```{r}
 PymolExecuteAndSave(pymol_cmd = pymol.cmd, output_file = "b0140_color.pse")
 ```
+
+Here is a image of the pymol session generated.
+![pymol grid mode image](b0140.png)
