@@ -20,3 +20,7 @@ Imports:
     glue,
     Biostrings,
     gdata
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
