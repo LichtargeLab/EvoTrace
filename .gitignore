@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 EvoTrace.Rproj
+*.DS_Store
