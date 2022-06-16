@@ -1,0 +1,118 @@
+---
+title: "Pymol_coloring"
+author: Chen Wang
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pymol_coloring}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 4, tibble.print_max = 4)
+```
+
+```{r setup, message = FALSE}
+library(EvoTrace)
+```
+This vignette shows how to use Pymol wrapper functions to color an Alphafold structure with ET, pLDDT and custom values.
+
+# Overview
+1. Extract ET, pLDDT values and assign color.
+1. Generate Pymol session.
+
+## Color assignment based on ET coverage
+Read ET file and assign color base on ET coverage. ET color range is from red to purple, indexing from 1-100 in a vector. The prefix for pymol hex color is "0x".
+```{r}
+scales::show_col(SelectColor("ET"), labels = FALSE)
+ET <- ReadET(ET_file = "b0140.cov") 
+b0140.color <- ET %>%
+  select(POS, coverage) %>%
+  mutate(ET.color = SelectColor(color_type = "ET", prefix = "0x")[ceiling(coverage)])
+b0140.color
+```
+
+## Color assignment based on AlphaFold pLDDT score
+AlphaFold structures report per-residue confidence metric (pLDDT) in the b factor column of the PDB structure. Residues with very high confident (pLDDT > 90), confident (90 >= pLDDT < 70), low confident (70 >= pLDDT > 50) and very low confident (pLDDT <= 50) are colored blue, cyan, yellow and red, respectively. pLDDT color range is from blue to orange, indexing from 1-100 in a vector.
+```{r}
+scales::show_col(SelectColor("alphafold"), labels = FALSE)
+```
+
+Extract pLDDT score from pdb file, then assign color.
+```{r}
+pLDDT <- GetpLDDT("b0140.pdb", chain = "A")
+b0140.color <- b0140.color %>%
+  left_join(pLDDT) %>%
+  mutate(pLDDT.color = SelectColor(color_type = "alphafold", prefix = "0x")[ceiling(pLDDT)])
+b0140.color
+```
+
+Assign custom color to residue 130 and 141.
+```{r}
+custom.color <- tibble(POS = c(139, 141), color = c("red", "cyan"))
+```
+
+## Generate Pymol session.
+Combine pymol commands in string vector then run PymolExecuteAndSave() to execute the commands.
+
+Load pdb file or pymol session.
+```{r}
+pymol.cmd <- PymolLoadFile("b0140.pdb")
+```
+
+Replicate protein b0140 and rename to ET, pLDDT, and custom. Pymol code can be chained into the cmd vector, and they will be ran sequentially. 
+```{r}
+pymol.cmd <- c(pymol.cmd,
+               "set_name b0140, ET", 
+               "copy pLDDT, ET",
+               "copy custom_color, ET")
+```
+
+Color all atoms to white.
+```{r}
+pymol.cmd <- c(pymol.cmd,
+               PymolColorChainSingleColor(color = "white"))
+```
+
+Color different protein objects by ET, pLDDT and custom color.
+```{r}
+pymol.cmd <- c(pymol.cmd,
+               PymolColorChainByResidue(chain = "A", position = b0140.color$POS,
+                                        color = b0140.color$ET.color,
+                                        object = "ET"),
+               PymolColorChainByResidue(chain = "A", position = b0140.color$POS,
+                                        color = b0140.color$pLDDT.color,
+                                        object = "pLDDT"),
+               PymolColorChainByResidue(chain = "A", position = custom.color$POS,
+                                        color = custom.color$color,
+                                        object = "custom_color"))
+```
+
+Select residue 139 and 141 as a selection in pymol. Then show them as spheres in custom_color object.
+```{r}
+pymol.cmd <- c(pymol.cmd,
+               PymolSelectResidues("A", position = c(139, 141),
+                                   selection_name = "highlight"),
+               "show spheres, custom_color and highlight")
+```
+
+Turn on grid view mode and sequence view. Ray a figure.
+```{r}
+pymol.cmd <- c(pymol.cmd,
+               "set seq_view, 1",
+               "set grid_mode, 1",
+               "cmd._cmd._draw(cmd._COb)", # This pymol cmd is necessary for png to work with grid view in pymol batch mode.
+               "png b0140.png, width=5cm, height=5cm, dpi=300, ray=1")
+```
+
+Execute Pymol commands and generate pymol session.
+```{r}
+PymolExecuteAndSave(pymol_cmd = pymol.cmd, output_file = "b0140_color.pse")
+```
+
+Here is the image that was just produce for the pymol session.
+![pymol grid mode image](b0140.png)
