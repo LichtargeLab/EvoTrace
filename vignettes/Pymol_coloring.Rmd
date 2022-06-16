@@ -100,11 +100,13 @@ pymol.cmd <- c(pymol.cmd,
                "show spheres, custom_color and highlight")
 ```
 
-Turn on grid view mode and sequence view. 
+Turn on grid view mode and sequence view. Ray a figure.
 ```{r}
 pymol.cmd <- c(pymol.cmd,
                "set seq_view, 1",
-               "set grid_mode, 1")
+               "set grid_mode, 1",
+               "cmd._cmd._draw(cmd._COb)", # This pymol cmd is necessary for png to work with grid view in pymol batch mode.
+               "png b0140.png, width=5cm, height=5cm, dpi=300, ray=1")
 ```
 
 Execute Pymol commands and generate pymol session.
@@ -112,5 +114,5 @@ Execute Pymol commands and generate pymol session.
 PymolExecuteAndSave(pymol_cmd = pymol.cmd, output_file = "b0140_color.pse")
 ```
 
-Here is a image of the pymol session generated.
+Here is the image that was just produce for the pymol session.
 ![pymol grid mode image](b0140.png)
