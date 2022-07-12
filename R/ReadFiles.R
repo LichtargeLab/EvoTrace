@@ -30,6 +30,7 @@ ReadET <- function(ET_file) {
 #' @export
 ReadFasta <- function(fasta_file, output_type = c("vector", "df")) {
   all.seq <- Biostrings::readAAStringSet(fasta_file)
+  output_type <- match.arg(output_type)
   if (output_type == "vector") {
     output <- as.character(all.seq)
     names(output) <- names(all.seq)
