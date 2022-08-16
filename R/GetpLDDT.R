@@ -1,9 +1,9 @@
 #' Get per-residue confidence metric (pLDDT) from AlphaFold structures
 #'
 #' @param pdb_file path to AlphaFold PDB file
-#' @param chain Character. Chains of interest. Usually AlphaFold structures are stored
+#' @param chain Character vector. Chains of interest. Usually AlphaFold structures are stored
 #' in chain A.
-#' @return A tibble that contains the amino acid positions and pLDDT scores.
+#' @return A tibble that contains the chains, amino acid positions and pLDDT scores.
 #' @description Amino acid positions and pLDDT scores are extracted from AlphaFold pdb
 #' file. pLDDT values are stored in b factor column. So this function can also be used
 #' to extract b factor from experimental pdb files. Use cation when applying to experimental
@@ -29,6 +29,7 @@ GetpLDDT <- function(pdb_file, chain = "A") {
                      "CYS", "TRP", "MSE"))
   output <- output %>%
     filter(X4 == "CA") %>%
-    select(POS = X9, pLDDT = X16)
+    arrange(chain, POS) %>%
+    select(chain = X8, POS = X9, pLDDT = X16)
   return(output)
 }
