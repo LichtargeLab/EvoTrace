@@ -12,7 +12,7 @@ AA3to1 <- function(AA) {
            "Q", "G", "R", "Y", "I", "N", "S", "F", "M",
            "C", "W", "M")
   names(AA1) <- AA3
-  output <- AA1[AA]
+  output <- AA1[toupper(AA)]
   names(output) <- NULL
   return(output)
 }
