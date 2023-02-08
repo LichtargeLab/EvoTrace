@@ -10,26 +10,19 @@
 #' data due to isoforms have the same AA position.
 #' @export
 GetpLDDT <- function(pdb_file, chain = "A") {
-  # Extract B factor from a pdb file
-  # Atoms in 20 AAs and MES (selenomethionine) are extraced
-  # Args:
-  #   pdb_file: string, path to pdb file
-  #   chain: string vector, protein chain(s) to extract from
-  # output: tibble
   pdb <- read_lines(pdb_file)
-  pdb_row_type <- str_sub(pdb, 1, 6)
-  output <- pdb[str_detect(pdb_row_type, "ATOM  |HETATM")] %>%
+  pdb_row_type <- stringr::str_sub(pdb, 1, 6)
+  output <- pdb[stringr::str_detect(pdb_row_type, "ATOM  |HETATM")] %>%
     I() %>%
-    read_fwf(., col_positions = fwf_widths(widths = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2)),
-             trim_ws = TRUE,
-             show_col_types = FALSE) %>%
-    filter(X8 %in% chain) %>%
-    filter(X6 %in% c("HIS", "PRO", "GLU", "THR", "LEU", "VAL", "LYS", "ASP", "ALA",
-                     "GLN", "GLY", "ARG", "TYR", "ILE", "ASN", "SER", "PHE", "MET",
-                     "CYS", "TRP", "MSE"))
-  output <- output %>%
-    filter(X4 == "CA") %>%
-    arrange(chain, POS) %>%
-    select(chain = X8, POS = X9, pLDDT = X16)
+    readr::read_fwf(., col_positions = readr::fwf_widths(widths = c(6, 5, 1, 4, 1, 3, 1, 1, 4, 1, 3, 8, 8, 8, 6, 6, 6, 4, 2, 2)),
+                    trim_ws = TRUE,
+                    show_col_types = FALSE) %>%
+    dplyr::filter(X8 %in% chain) %>%
+    dplyr::filter(X6 %in% c("HIS", "PRO", "GLU", "THR", "LEU", "VAL", "LYS", "ASP", "ALA",
+                            "GLN", "GLY", "ARG", "TYR", "ILE", "ASN", "SER", "PHE", "MET",
+                            "CYS", "TRP", "MSE")) %>%
+    dplyr::filter(X4 == "CA") %>%
+    dplyr::select(chain = X8, POS = X9, pLDDT = X16) %>%
+    dplyr::arrange(chain, POS)
   return(output)
 }
