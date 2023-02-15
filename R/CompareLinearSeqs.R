@@ -9,18 +9,29 @@
 #' @description Compared two linear sequences. The matching positions in the two
 #' linear sequences are returned.
 #' @export
-CompareLinearSeqs <- function(seq1, seq2, pos.only = TRUE, penalty = c("blastp", "pyETv")) {
+CompareLinearSeqs <- function(seq1, seq2, pos.only = TRUE, penalty = c("blastp", "pyETv", "DNA")) {
   penalty <- match.arg(penalty)
   if(penalty == "blastp") {
     gap.open = 11
     gap.extend = 1
-  } else {
+  } else if (penalty == "pyETV"){
     gap.open = 10
     gap.extend = 0.5
+  } else {
+    gap.open = 1
+    gap.extend = 1
   }
-  alignment <- Biostrings::pairwiseAlignment(pattern = seq1, subject = seq2,
-                                             substitutionMatrix = "BLOSUM62",
-                                             gapOpening = gap.open, gapExtension = gap.extend)
+
+  if (penalty == "DNA") {
+    mat <- Biostrings::nucleotideSubstitutionMatrix(match = 1, mismatch = -2, baseOnly = TRUE)
+    alignment <- Biostrings::pairwiseAlignment(pattern = seq1, subject = seq2,
+                                               substitutionMatrix = mat,
+                                               gapOpening = gap.open, gapExtension = gap.extend)
+  } else {
+    alignment <- Biostrings::pairwiseAlignment(pattern = seq1, subject = seq2,
+                                               substitutionMatrix = "BLOSUM62",
+                                               gapOpening = gap.open, gapExtension = gap.extend)
+  }
 
   align.df <- c(Biostrings::alignedPattern(alignment),
                 Biostrings::alignedSubject(alignment)) %>%
