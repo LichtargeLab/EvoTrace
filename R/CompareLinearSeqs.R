@@ -71,5 +71,8 @@ CompareLinearSeqs <- function(seq1, seq2, pos.only = TRUE, penalty = c("blastp",
     align.df <- select(align.df, AA.POS.seq1, AA.POS.seq2) %>%
       filter(!is.na(AA.POS.seq1), !is.na(AA.POS.seq2))
   }
+  if (penalty == "DNA") {
+    names(align.df) <- str_replace(names(align.df), "AA", "DNA")
+  }
   return(align.df)
 }
