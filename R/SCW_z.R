@@ -34,9 +34,10 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
     filter(A == 1)
 
   AssignType <- function(i,j,k,l) {
-    output <- rep("B", length(i))
-    output[which((i == k & j == l)|(i == l & j == k))] <- "A"
-    output[which((i != k) & (i != l) & (j != k) & (j != l))] <- "C"
+    output <- rep("C", length(i))
+    check <- (i == k) + (i == l) + (j == k) + (j == l)
+    output[check == 2] <- "A"
+    output[check == 1] <- "B"
     return(output)
   }
 
