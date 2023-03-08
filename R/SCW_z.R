@@ -30,7 +30,6 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
     mutate(A = ifelse(dist < dist_cutoff, 1, 0))
 
   dist_filt <- dist %>%
-    filter(POS_i < POS_j) %>%
     filter(A == 1)
 
   AssignType <- function(i,j,k,l) {
@@ -57,7 +56,7 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
               unbias = sum(unbias_term)) %>%
     ungroup() %>%
     add_row(type = "SS_hat", bias = sum(w_ave_df$bias_term), unbias = sum(w_ave_df$unbias_term))
-  pdb_length = length(unique(dist$POS_i))
+  pdb_length = length(unique(dist$POS_i)) + 1
 
   return(list("dist_filt" = dist_filt, "class_count" = class_count, "pdb_length" = pdb_length))
 }
