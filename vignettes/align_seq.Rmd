@@ -1,0 +1,55 @@
+---
+title: "Align PDB seq with ET seq"
+author: Chen Wang
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Align PDB seq with ET seq}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(EvoTrace)
+```
+This vignette shows how to generate a sequence mapping between the linear sequence in ET file and sequence in a pdb file. 
+
+
+## Extract linear sequence from ET
+Read ET file and combine the amino acids into a string.
+```{r}
+ET <- ReadET(ET_file = "b0140.cov") 
+ET_seq <- paste0(ET$AA, collapse = "")
+ET
+ET_seq
+```
+
+## Align sequences and output a mapping dataframe
+PyETv uses a slightly different penalty score than blastp. The alignments are 
+usually identical no matter what penalties are use.
+The AA.POS.pdb column in the align_df shows the actual residue number in the pdb file.
+```{r}
+align_df <- EvoTrace::CompareSeqs(pdb_file = "5ghu.pdb", chain = "A", seq = ET_seq,
+                                  pos.only = FALSE, penalty = "pyETv")
+align_df %>% filter(align.POS >= 21, align.POS <= 30)
+```
+
+## Generate regular alignment output
+The actual alignment of the two sequences can be obtained with these commands.
+```{r}
+pdb_df <- GetCoordinates(pdb_file = "5ghu.pdb", chain = "A", CA_only = TRUE) %>%
+  select(AA.pdb = AA, AA.POS.pdb = POS) %>%
+  arrange(AA.POS.pdb)
+pdb_str <- pdb_df$AA.pdb %>%
+  paste0(., collapse = "")
+alignment <- Biostrings::pairwiseAlignment(pattern = pdb_str, subject = ET_seq,
+                                           substitutionMatrix = "BLOSUM62",
+                                           gapOpening = 10, gapExtension = 0.5) #PyETv settings
+Biostrings::writePairwiseAlignments(alignment)
+```

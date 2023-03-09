@@ -4,3 +4,4 @@
 .Ruserdata
 EvoTrace.Rproj
 *.DS_Store
+inst/doc
