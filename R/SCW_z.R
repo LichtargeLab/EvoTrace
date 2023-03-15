@@ -14,7 +14,8 @@
 GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
   # This computes class counts used in calculation of
   # w_hat, w^2_hat in SCW z score.
-  # It will produce values for both unbiased (1) and biased (j-i) approach
+  # It will produce values for both unbiased (1), biased (j-i) and
+  # adj_dist (cutoff - dist) approach
   # Args:
   #   pdb.file: path to pdb file
   #   chain: chain of interest
@@ -30,7 +31,10 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
     mutate(A = ifelse(dist < dist_cutoff, 1, 0))
 
   dist_filt <- dist %>%
-    filter(A == 1)
+    filter(A == 1) %>%
+    mutate(bias_term = POS_j - POS_i,
+           unbias_term = 1,
+           adj_dist_term = dist_cutoff - dist)
 
   AssignType <- function(i,j,k,l) {
     output <- rep("C", length(i))
@@ -40,26 +44,33 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
     return(output)
   }
 
-  w2_class <- select(dist_filt, i = POS_i, j = POS_j) %>%
-    crossing(., select(dist_filt, k = POS_i, l = POS_j)) %>%
+  w2_class <- select(dist_filt, i = POS_i, j = POS_j, dist1 = dist) %>%
+    crossing(., select(dist_filt, k = POS_i, l = POS_j, dist2 = dist)) %>%
     mutate(bias_term = (j-i)*(l-k),
-           unbias_term = 1) %>%
+           unbias_term = 1,
+           adj_dist_term = (dist_cutoff - dist1)*(dist_cutoff - dist2)) %>%
     mutate(type = AssignType(i,j,k,l))
 
   w_ave_df <- dist_filt %>%
     mutate(bias_term = POS_j - POS_i,
-           unbias_term = 1)
+           unbias_term = 1,
+           adj_dist_term = dist_cutoff - dist)
 
   class_count <- w2_class %>%
     group_by(type) %>%
     summarize(bias = sum(bias_term),
-              unbias = sum(unbias_term)) %>%
+              unbias = sum(unbias_term),
+              adj_dist = sum(adj_dist_term)) %>%
     ungroup() %>%
-    add_row(type = "SS_hat", bias = sum(w_ave_df$bias_term), unbias = sum(w_ave_df$unbias_term))
+    add_row(type = "SS_hat",
+            bias = sum(w_ave_df$bias_term),
+            unbias = sum(w_ave_df$unbias_term),
+            adj_dist = sum(w_ave_df$adj_dist_term))
   pdb_length = length(unique(dist$POS_i)) + 1
 
   return(list("dist_filt" = dist_filt, "class_count" = class_count, "pdb_length" = pdb_length))
 }
+
 
 
 
@@ -70,8 +81,8 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
 #' @param resi numeric vector. The selection of residue positions. Residue positions
 #' should be based on pdb structure not the sequence positions
 #' @param output_df Whether a df should be returned instead of a vector.
-#' @return a vector or df with biased and unbiased SCW z scores.
-#' @description This function calculates the biased and unbiased SCW z scores
+#' @return a vector or df with biased, unbiased, and adj_dist SCW z scores.
+#' @description This function calculates the biased, unbiased, and adj_dist SCW z scores
 #' for a given selection of residues in the structure.
 #' @export
 ComputeSCWzscore <- function(SCW_background, resi, output_df = FALSE) {
@@ -83,36 +94,32 @@ ComputeSCWzscore <- function(SCW_background, resi, output_df = FALSE) {
   #   be based on pdb structure not the sequence positions
   #   output_df: logi. Whether a df should be returned instead of a vector.
   # output:
-  #   biased and unbiased SCW z scores
+  #   biased, unbiased, and adj_dist SCW z scores
   w_df <- SCW_background[["dist_filt"]] %>%
     filter(POS_i %in% resi,
-           POS_j %in% resi) %>%
-    mutate(bias_term = POS_j - POS_i,
-           unbias_term = 1)
+           POS_j %in% resi)
 
-  w <- c(sum(w_df$bias_term), sum(w_df$unbias_term))
-  names(w) <- c("bias", "unbias")
+  w <- c(sum(w_df$bias_term), sum(w_df$unbias_term), sum(w_df$adj_dist_term))
+  names(w) <- c("bias", "unbias", "adj_dist")
   m <- length(resi)
   l <- SCW_background[["pdb_length"]]
 
   pi1 <- m * (m - 1.0) / (l * (l - 1.0))
   pi2 <- pi1 * (m - 2.0) / (l - 2.0)
   pi3 <- pi2 * (m - 3.0) / (l - 3.0)
-  w_ave <- as.numeric(SCW_background[["class_count"]][4,2:3]) * pi1
-  w2_ave <- (pi1 * as.numeric(SCW_background[["class_count"]][1,2:3]) +
-               (pi2 * as.numeric(SCW_background[["class_count"]][2,2:3])) +
-               (pi3 * as.numeric(SCW_background[["class_count"]][3,2:3])))
+  w_ave <- as.numeric(SCW_background[["class_count"]][4,2:4]) * pi1
+  w2_ave <- (pi1 * as.numeric(SCW_background[["class_count"]][1,2:4]) +
+               (pi2 * as.numeric(SCW_background[["class_count"]][2,2:4])) +
+               (pi3 * as.numeric(SCW_background[["class_count"]][3,2:4])))
   sigma <- sqrt(w2_ave - w_ave * w_ave)
   z <- (w - w_ave)/sigma
   if (output_df == TRUE) {
-    output <- tibble(bias = z[1], unbias = z[2])
+    output <- tibble(bias = z[1], unbias = z[2], adj_dist = z[3])
   } else {
     output <- z
   }
   return(output)
 }
-
-
 
 #' Compute SCW z scores with multiple selection of residues
 #'
