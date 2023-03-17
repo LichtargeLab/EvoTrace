@@ -68,7 +68,10 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
             adj_dist = sum(w_ave_df$adj_dist_term))
   pdb_length = length(unique(dist$POS_i)) + 1
 
-  return(list("dist_filt" = dist_filt, "class_count" = class_count, "pdb_length" = pdb_length))
+  return(list("dist_filt" = select(dist_filt, POS_i, POS_j, dist),
+              "class_count" = class_count,
+              "pdb_length" = pdb_length,
+              "dist_cutoff" = dist_cutoff))
 }
 
 
@@ -96,6 +99,9 @@ ComputeSCWzscore <- function(SCW_background, resi, output_df = FALSE) {
   # output:
   #   biased, unbiased, and adj_dist SCW z scores
   w_df <- SCW_background[["dist_filt"]] %>%
+    mutate(bias_term = POS_j - POS_i,
+           unbias_term = 1,
+           adj_dist_term = SCW_background[["dist_cutoff"]] - dist) %>%
     filter(POS_i %in% resi,
            POS_j %in% resi)
 
