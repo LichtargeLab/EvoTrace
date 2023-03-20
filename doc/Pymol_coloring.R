@@ -7,6 +7,7 @@ options(tibble.print_min = 4, tibble.print_max = 4)
 
 ## ----setup, message = FALSE---------------------------------------------------
 library(EvoTrace)
+library(dplyr)
 
 ## -----------------------------------------------------------------------------
 scales::show_col(SelectColor("ET"), labels = FALSE)

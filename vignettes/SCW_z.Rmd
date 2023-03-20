@@ -1,0 +1,74 @@
+---
+title: "Selection Clustering Weight (SCW) z scores"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Selection Clustering Weight (SCW) z scores}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Background
+SCW z scores are used to evaluate if a selection of residues are significantly clustered in the protein structure. 
+
+
+SCW z score has a predefined adjacency cutoff. If any atoms between two residues are closer than the cutoff, they are consider adjacent. When evaluating ET predictions (30% of the residues), we normally use adjacency cutoff of 4A. When evaluating mutated residues, where the coverage is usually low, using higher cutoff (10A) is preferred. Any pairs within the residue of selection that pass the cutoff, will be rewarded for of a score (SCW score). The total of SCW score is then compared with a null distribution (the SCW score from random selection of same number of residues). The mean and standard deviation of SCW score is computed using a closed form equation. Please refer to ([Mihalek *et al*](https://www.sciencedirect.com/science/article/abs/pii/S0022283603006636)) for details.
+
+
+There are 3 forms of SCW scores, biased (j-i), unbiased (1), and adjusted_distance (cutoff - distance). The biased one gives more weight on linearly distant residue pairs, the adjusted_distance one gives more weight on structurally close residue pairs. Biased and unbiased scores are often used to evaluate ET prediction, while unbiased and adjusted_distance scores are recommended for evaluating clustering of mutated residues.
+
+
+As an example, we evaluate the clustering of mutated residues in colistin resistant *E. coli* in basS AlphaFold structure.
+### Get the mutated residues
+As a control, we randomly select 6 residues
+```{r}
+resi_mut <- c(10, 14, 84, 94, 20, 88, 149, 105, 312)
+set.seed(54)
+resi_random <- sample(1:363, length(resi_mut))
+resi_mut
+resi_random
+```
+
+### Get the background parameters to compute mean and std for SCW z scores
+Since the coverage of mutate residues are low, we use 10A as adjacency matrix cutoff.
+```{r, message=FALSE}
+library(EvoTrace)
+basS_10A_bg <- GetSCWBackgound(pdb_file = "AF-P30844-F1-model_v4.pdb",
+                               chain = "A", dist_cutoff = 10)
+basS_10A_bg
+```
+
+
+SCW z scores can also be computed on a restricted region of the protein. For example, some regions in the AlphaFold structure are poorly predicted. We can compute the SCW background parameters on high confident regions.
+```{r}
+# Extract AF confident score (pLDDT)
+basS_pLDDT <- GetpLDDT("AF-P30844-F1-model_v4.pdb", chain = "A")
+basS_10A_AF70_bg <- GetSCWBackgound(pdb_file = "AF-P30844-F1-model_v4.pdb",
+                                    chain = "A", dist_cutoff = 10,
+                                    resi = basS_pLDDT$POS[basS_pLDDT$pLDDT>=70])
+basS_10A_AF70_bg
+```
+### Compute SCW z scores
+SCW z scores for mutated positions on full length and high confident regions of the protein are all significant, suggest these positions cluster on the protein structure. 
+```{r}
+ComputeSCWzscore(basS_10A_bg, resi_mut)
+```
+
+```{r}
+ComputeSCWzscore(basS_10A_AF70_bg, resi_mut)
+```
+
+As negative controls, the random selected positions have non significant z scores.
+```{r}
+ComputeSCWzscore(basS_10A_bg, resi_random)
+```
+
+```{r}
+ComputeSCWzscore(basS_10A_AF70_bg, resi_random)
+```

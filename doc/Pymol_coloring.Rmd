@@ -18,6 +18,7 @@ options(tibble.print_min = 4, tibble.print_max = 4)
 
 ```{r setup, message = FALSE}
 library(EvoTrace)
+library(dplyr)
 ```
 This vignette shows how to use Pymol wrapper functions to color an Alphafold structure with ET, pLDDT and custom values.
 
