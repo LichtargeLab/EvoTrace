@@ -57,18 +57,18 @@ basS_10A_AF70_bg
 ### Compute SCW z scores
 SCW z scores for mutated positions on full length and high confident regions of the protein are all significant, suggest these positions cluster on the protein structure. 
 ```{r}
-ComputeSCWzscore(basS_10A_bg, resi_mut)
+ComputeSCWzscore(SCW_background = basS_10A_bg, resi = resi_mut)
 ```
 
 ```{r}
-ComputeSCWzscore(basS_10A_AF70_bg, resi_mut)
+ComputeSCWzscore(SCW_background = basS_10A_AF70_bg, resi = resi_mut)
 ```
 
 As negative controls, the random selected positions have non significant z scores.
 ```{r}
-ComputeSCWzscore(basS_10A_bg, resi_random)
+ComputeSCWzscore(SCW_background = basS_10A_bg, resi = resi_random)
 ```
 
 ```{r}
-ComputeSCWzscore(basS_10A_AF70_bg, resi_random)
+ComputeSCWzscore(SCW_background = basS_10A_AF70_bg, resi = resi_random)
 ```
