@@ -16,9 +16,9 @@ should be based on pdb structure not the sequence positions}
 \item{output_df}{Whether a df should be returned instead of a vector.}
 }
 \value{
-a vector or df with biased and unbiased SCW z scores.
+a vector or df with biased, unbiased, and adj_dist SCW z scores.
 }
 \description{
-This function calculates the biased and unbiased SCW z scores
+This function calculates the biased, unbiased, and adj_dist SCW z scores
 for a given selection of residues in the structure.
 }

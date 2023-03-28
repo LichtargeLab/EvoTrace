@@ -9,11 +9,11 @@ GetpLDDT(pdb_file, chain = "A")
 \arguments{
 \item{pdb_file}{path to AlphaFold PDB file}
 
-\item{chain}{Character. Chains of interest. Usually AlphaFold structures are stored
+\item{chain}{Character vector. Chains of interest. Usually AlphaFold structures are stored
 in chain A.}
 }
 \value{
-A tibble that contains the amino acid positions and pLDDT scores.
+A tibble that contains the chains, amino acid positions and pLDDT scores.
 }
 \description{
 Amino acid positions and pLDDT scores are extracted from AlphaFold pdb

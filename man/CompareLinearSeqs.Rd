@@ -4,7 +4,12 @@
 \alias{CompareLinearSeqs}
 \title{Compare two protein linear sequences}
 \usage{
-CompareLinearSeqs(seq1, seq2, pos.only = TRUE, penalty = c("blastp", "pyETv"))
+CompareLinearSeqs(
+  seq1,
+  seq2,
+  pos.only = TRUE,
+  penalty = c("blastp", "pyETv", "DNA")
+)
 }
 \arguments{
 \item{seq1}{Character string. Linear sequence of protein 1}
