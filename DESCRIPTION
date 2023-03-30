@@ -15,7 +15,8 @@ Depends:
     stringr,
     readr,
     purrr,
-    tidyr
+    tidyr,
+    R (>= 2.10)
 Imports: 
     glue,
     Biostrings,
