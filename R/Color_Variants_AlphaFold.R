@@ -30,17 +30,13 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
   # using case variants, then gets removed.
   rm_ctrl <- is.null(variants_ctrl)
 
-  ET_storage <- id_map$storage[which(id_map$prot_id == prot_id)]
   AF_url <- id_map$AF_url[which(id_map$prot_id == prot_id)]
   AF_pdb <- read_lines(AF_url)
   if (is.na(AF_url)) {
     stop("No AlphaFold structure for this protein")
   }
 
-  ET_df <- read_rds(file.path(system.file("extdata", package = "EvoTrace"), ET_storage))
-  ET_df <- ET_df$data[ET_df$prot_id == prot_id]%>%
-    .[[1]] %>%
-    mutate(AA_POS = 1:n())
+  ET_df <- FetchET(prot_id)
 
   variants_case <- variants_case %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
