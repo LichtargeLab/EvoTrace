@@ -36,7 +36,8 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
     stop("No AlphaFold structure for this protein")
   }
 
-  ET_df <- FetchET(prot_id)
+  ET_df <- FetchET(prot_id) %>%
+    dplyr::rename(AA_POS = POS)
 
   variants_case <- variants_case %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
