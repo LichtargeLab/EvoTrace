@@ -5,19 +5,17 @@
 #' be used in SUB, eg. L10P. EA can be replaced with other values, but have to scale to the
 #' range of (0, 100].
 #' @param variants_ctrl A dataframe that stores the mutations in the controls in target gene.
-#' @param pse_output Path to store the pymol session file.
+#' @param pml_output Path to store the pymol command file.
 #' @param prot_id Protein identification. Use full ENSP for human proteins, eg. ENSP00000388638.1.
 #' Use locus tag for E. coli MG1655 proteins, eg. b4112.
-#' @return A tibble that contains the coloring information. The pse file will
-#' be written to the location indicated by pse_output.
-#' @description Map variants and ET scores to AlphaFold structures. Pymol is required. Check if Pymol
-#' can be started from command line with "pymol". If not, an open source pymol can be installed
-#' through conda or home brew. The reference amino acid in the mutations will be checked against
-#' the ones in the ET dataset. But the EA scores won't be checked.
+#' @return A tibble that contains the coloring information. The pml file will
+#' be written to the location indicated by pml_output.
+#' @description Map variants and ET scores to AlphaFold structures. Pymol is required to view the pml
+#' file. Network connection is also required to load the pdb file from AlphaFold.
 #' @export
 
 Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
-                                     prot_id, pse_output) {
+                                     prot_id, pml_output) {
   if ((sum(c("SUB", "EA") %in% names(variants_case))) < 2) {
     stop("variants_case df should contain these cols: SUB, EA")
   }
@@ -120,7 +118,7 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
     pymol_color_df <- pymol_color_df %>%
       mutate(EA_ctrl = NA, EA_ctrl_color = NA)
   }
-  PymolExecuteAndSave(pymol_cmd = pymol_cmd, output_file = pse_output)
+  writeLines(pymol_cmd, con = pml_output)
   return(pymol_color_df)
 }
 

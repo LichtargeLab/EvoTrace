@@ -8,7 +8,7 @@ Color_Variants_AlphaFold(
   variants_case,
   variants_ctrl = NULL,
   prot_id,
-  pse_output
+  pml_output
 )
 }
 \arguments{
@@ -22,15 +22,13 @@ range of (0, 100].}
 \item{prot_id}{Protein identification. Use full ENSP for human proteins, eg. ENSP00000388638.1.
 Use locus tag for E. coli MG1655 proteins, eg. b4112.}
 
-\item{pse_output}{Path to store the pymol session file.}
+\item{pml_output}{Path to store the pymol command file.}
 }
 \value{
-A tibble that contains the coloring information. The pse file will
-be written to the location indicated by pse_output.
+A tibble that contains the coloring information. The pml file will
+be written to the location indicated by pml_output.
 }
 \description{
-Map variants and ET scores to AlphaFold structures. Pymol is required. Check if Pymol
-can be started from command line with "pymol". If not, an open source pymol can be installed
-through conda or home brew. The reference amino acid in the mutations will be checked against
-the ones in the ET dataset. But the EA scores won't be checked.
+Map variants and ET scores to AlphaFold structures. Pymol is required to view the pml
+file. Network connection is also required to load the pdb file from AlphaFold.
 }
