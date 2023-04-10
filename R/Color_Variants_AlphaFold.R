@@ -39,7 +39,7 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
 
   variants_case <- variants_case %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
-           AA_POS = as.numeric(str_sub(SUB, 2, -2))) %>%
+           AA_POS = as.numeric(str_extract(SUB, "[[:digit:]]+"))) %>%
     group_by(AA_POS, AA_REF) %>% # If multiple mutations are reported in the same position, the max EA is used.
     summarize(EA = max(EA), .groups = "drop") %>%
     mutate(AA_ET = ET_df$AA[AA_POS])
