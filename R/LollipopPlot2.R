@@ -163,7 +163,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
     # geom_point(aes(x=AA_POS, y=y_var, alpha = EA), size = 2, color = "black", fill = "black") +
     xlim(0, max(ET$AA_POS) + 1) +
     scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2)) +
-    guides(y = guide_axis_truncated(trunc_lower = 0, trunc_upper = max_lim_ctrl*1.2)) +
+    guides(y = guide_axis_truncated(trunc_lower = 0, trunc_upper = max_lim_case*1.2)) +
     y_label +
     scale_size(range = c(2, 4)) +
     scale_color_manual(values = GetManualColor(mut_case$color)) +
