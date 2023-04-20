@@ -16,11 +16,13 @@ Depends:
     readr,
     purrr,
     tidyr,
-    R (>= 2.10)
+    R (>= 2.10),
+    ggplot2
 Imports: 
     glue,
     Biostrings,
-    gdata
+    gdata,
+    egg
 Suggests: 
     knitr,
     rmarkdown

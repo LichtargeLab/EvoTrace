@@ -6,13 +6,13 @@
 \usage{
 SelectColor(
   color_type = c("ET", "red_white", "red_white_blue", "white_red", "white_blue",
-    "alphafold"),
+    "alphafold", "gray_scale", "EA_bin"),
   prefix = "#"
 )
 }
 \arguments{
 \item{color_type}{The type of color range to use. Available selections: "ET",
-"red_white", "red_white_blue", "white_red", "white_blue, "alphafold".}
+"red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_sacle", "EA_bin".}
 
 \item{prefix}{"#" or "0x". Use "0x" when passing color values to pymol.}
 }

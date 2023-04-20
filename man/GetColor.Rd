@@ -9,7 +9,7 @@ GetColor(
   lower_bound,
   upper_bound,
   color_type = c("ET", "red_white", "red_white_blue", "white_red", "white_blue",
-    "alphafold")
+    "alphafold", "gray_scale", "EA_bin")
 )
 }
 \arguments{

@@ -1,14 +1,15 @@
 #' Return a preset color range (hex code) with 100 colors
 #'
 #' @param color_type The type of color range to use. Available selections: "ET",
-#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold".
+#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_sacle", "EA_bin".
 #' @param prefix "#" or "0x". Use "0x" when passing color values to pymol.
 #' @return a character string with length of 100. Contains hex code of 100 colors.
 #' @description Return a color scheme of 100 colors. For ET color, the smaller the
 #' index, the warmer the color. For alphafold color, the larger the index, the more
 #' confident of the structure prediction.
 #' @export
-SelectColor <- function(color_type = c("ET", "red_white", "red_white_blue", "white_red", "white_blue", "alphafold"),
+SelectColor <- function(color_type = c("ET", "red_white", "red_white_blue", "white_red",
+                                       "white_blue", "alphafold", "gray_scale", "EA_bin"),
                         prefix = "#") {
   if (color_type == "ET") {
     colorRange <- c("ff0000", "ff0c00", "ff1800", "ff2400", "ff3000", "ff3d00", "ff4900", "ff5500", "ff6100", "ff6e00",
@@ -33,8 +34,14 @@ SelectColor <- function(color_type = c("ET", "red_white", "red_white_blue", "whi
     colorRange <- colorRampPalette(c("red", "white", "blue"))(100)
   } else if (color_type == "white_red") {
     colorRange <- colorRampPalette(c("white", "red"))(100)
-  } else {
+  } else if (color_type == "white_blue") {
     colorRange <- colorRampPalette(c("white", "blue"))(100)
+  } else if (color_type == "gray_scale") {
+    colorRange <- colorRampPalette(c("gray90", "black"))(100)
+  } else if (color_type == "EA_bin") {
+    colorRange <- c(rep("#90d1e2", 30),
+                    rep("#ffba57", 40),
+                    rep("#ff0000", 30))
   }
   if (prefix == "0x") {
     colorRange <- colorRange %>%

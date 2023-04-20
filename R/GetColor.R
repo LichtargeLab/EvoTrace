@@ -14,7 +14,7 @@
 
 GetColor <- function(x, lower_bound, upper_bound,
                      color_type = c("ET", "red_white", "red_white_blue", "white_red",
-                                    "white_blue", "alphafold")) {
+                                    "white_blue", "alphafold", "gray_scale", "EA_bin")) {
   if (min(x, na.rm = TRUE) <= lower_bound) {
     stop("Lower bound should be smaller than the minimum value of x.")
   }
