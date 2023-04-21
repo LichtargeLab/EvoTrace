@@ -1,4 +1,4 @@
-#' Plot lollipop plot
+#' Plot lollipop plot for case and control
 #'
 #' @param variants_case A dataframe with the variants in the cases. "SUB", "EA" and "AC" columns
 #' are required. SUB should be 1 letter format, e.g. S10L. EA should be numerical between 0-100.
@@ -24,9 +24,10 @@
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to compare mutational profile between cases and
 #' controls in a given gene. The center ET track is colored as prismatic style, with the most important
-#' ET positions as red. The hight of the lollipops reflects allele count. The color and/or size of the
+#' ET positions as red. The height of the lollipops reflects allele count. The color and/or size of the
 #' circles reflects EA scores for the mutations. This function fetch pre stored ET scores, which only
-#' works for human and E. coli reference proteins.
+#' works for human and E. coli reference proteins. See LollipopPlot for ploting mutations only from the
+#' case.
 #' @export
 #' @examples
 #' # Prepare variant data
@@ -43,13 +44,13 @@
 #'   mutate(AC = round(AC)) %>%
 #'   mutate(AF = AC/1000)
 #'
-#' # Make log scale plot
+#' # Make log scale plot using prismatic coloring
 #' LollipopPlot2(variants_case = mut_case, variants_ctrl = mut_ctrl,
 #'               prot_id = "b4112", AC_scale = "log",
 #'               plot_domain = TRUE, show_EA_bin = TRUE,
 #'               EA_color = "prismatic")
 #'
-#' # Make linear scale plot
+#' # Make linear scale plot using EA_bin coloring
 #' LollipopPlot2(variants_case = mut_case, variants_ctrl = mut_ctrl,
 #'               prot_id = "b4112", AC_scale = "linear",
 #'               plot_domain = FALSE, show_EA_bin = TRUE,
