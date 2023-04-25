@@ -279,7 +279,8 @@ PrepareMuts <- function(df, y_var = c("log", "linear"), EA_color) {
 
 ParseDomain <- function(x) {
   domain <- x[str_starts(x, "/note")]
-  domain <- str_sub(domain, 9, -3)
+  domain <- str_sub(domain, 7, -1)
+  domain <- str_remove_all(domain, '"')
   coord <- x[str_starts(x, "DOMAIN")]
   coord <- str_sub(coord, 8, -1)
   output <- tibble(domain = domain, coord = coord) %>%
