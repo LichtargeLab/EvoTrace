@@ -97,7 +97,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   }
   variants_ctrl <- variants_ctrl %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
-           AA_POS = as.numeric(str_sub(SUB, 2, -2))) %>%
+           AA_POS = as.numeric(str_extract(SUB, "[[:digit:]]+"))) %>%
     mutate(AA_ET = ET$AA[AA_POS])
   if (sum(variants_ctrl$AA_REF != variants_ctrl$AA_ET) > 0) {
     unmatch_POS <- variants_ctrl$AA_POS[variants_ctrl$AA_REF != variants_ctrl$AA_ET]
