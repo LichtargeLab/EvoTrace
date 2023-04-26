@@ -22,17 +22,17 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
 
   # Check if there is ET for this protein
   if (!prot_id %in% id_map$prot_id) {
-    stop("No ET for this protein")
+    return("No ET for this protein")
   }
   # When ctrl variants are not provided, ctrl panel is first generated
   # using case variants, then gets removed.
   rm_ctrl <- is.null(variants_ctrl)
 
   AF_url <- id_map$AF_url[which(id_map$prot_id == prot_id)]
-  AF_pdb <- read_lines(AF_url)
   if (is.na(AF_url)) {
-    stop("No AlphaFold structure for this protein")
+    return("No AlphaFold structure for this protein")
   }
+  AF_pdb <- read_lines(AF_url)
 
   ET_df <- FetchET(prot_id) %>%
     dplyr::rename(AA_POS = POS)
@@ -56,7 +56,7 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
     }
     variants_ctrl <- variants_ctrl %>%
       mutate(AA_REF = str_sub(SUB, 1,1),
-             AA_POS = as.numeric(str_sub(SUB, 2, -2))) %>%
+             AA_POS = as.numeric(str_extract(SUB, "[[:digit:]]+"))) %>%
       group_by(AA_POS, AA_REF) %>% # If multiple mutations are reported in the same position, the max EA is used.
       summarize(EA = max(EA), .groups = "drop") %>%
       mutate(AA_ET = ET_df$AA[AA_POS])
