@@ -14,7 +14,8 @@ LollipopPlot2(
   EA_color = c("prismatic", "gray_scale", "EA_bin", "black"),
   fix_scale = TRUE,
   pad_ratio = 0.05,
-  domain_min_dist = 0
+  domain_min_dist = 0,
+  title = NULL
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ Use larger values for larger space.}
 \item{domain_min_dist}{Controls the minimum distances between two domains in the domain track.
 If the distance between two domains are less than domain_min_dist, they will be plotted in separate lines.
 If domain annotations overlap, set to a larger value.}
+
+\item{title}{Title for the plot.}
 }
 \value{
 lollipop plot

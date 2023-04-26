@@ -18,6 +18,7 @@
 #' @param domain_min_dist Controls the minimum distances between two domains in the domain track.
 #' If the distance between two domains are less than domain_min_dist, they will be plotted in separate lines.
 #' If domain annotations overlap, set to a larger value.
+#' @param title Title for the plot.
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to show mutational profile in a given gene. The center ET track is colored as prismatic style, with the most important
 #' ET positions as red. The height of the lollipops reflects allele count. The color and/or size of the
@@ -54,7 +55,8 @@ LollipopPlot <- function(variants,
                          EA_color = c("prismatic", "gray_scale", "EA_bin", "black"),
                          fix_scale = TRUE,
                          domain_min_dist = 0,
-                         pad_ratio = 0.1) {
+                         pad_ratio = 0.1,
+                         title = NULL) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
   if ((sum(c("SUB", "EA", "AC") %in% names(variants))) < 3) {
@@ -146,13 +148,14 @@ LollipopPlot <- function(variants,
           legend.position = "none"
     )
 
-
+  title_grob <- grid::textGrob(title, gp=grid::gpar(fontsize=20, fontface="bold"), x = unit(0.1, "npc"),
+                               just = "left")
   if (plot_domain == TRUE) {
     domain <- id_map[id_map$prot_id == prot_id,]
     if (is.na(domain$domain) == TRUE) {
       cat("No domain information for this protein.")
       output <- egg::ggarrange(mut_case_plot, ET_plot,
-                               ncol = 1, heights = c(10,1), draw = FALSE)
+                               ncol = 1, heights = c(10,1), draw = FALSE, top = title_grob)
     } else {
       domain <- id_map[id_map$prot_id == prot_id,] %>%
         mutate(domain_df = str_split(domain, "; ", simplify = FALSE)) %>%
@@ -172,11 +175,11 @@ LollipopPlot <- function(variants,
         theme(plot.margin = margin(t = 10, r = 0, b = 0, l = 10))
 
       output <- egg::ggarrange(domain_plot, mut_case_plot, ET_plot,
-                               ncol = 1, heights = c(domian_plot_height,10,1), draw = FALSE)
+                               ncol = 1, heights = c(domian_plot_height,10,1), draw = FALSE, top = title_grob)
     }
   } else {
     output <- egg::ggarrange(mut_case_plot, ET_plot,
-                             ncol = 1, heights = c(10,1), draw = FALSE)
+                             ncol = 1, heights = c(10,1), draw = FALSE, top = title_grob)
   }
   return(output)
 }

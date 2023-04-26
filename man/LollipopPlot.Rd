@@ -13,7 +13,8 @@ LollipopPlot(
   EA_color = c("prismatic", "gray_scale", "EA_bin", "black"),
   fix_scale = TRUE,
   domain_min_dist = 0,
-  pad_ratio = 0.1
+  pad_ratio = 0.1,
+  title = NULL
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ If domain annotations overlap, set to a larger value.}
 
 \item{pad_ratio}{Controls the extra space between the ET (center) track and the mutation tracks.
 Use larger values for larger space.}
+
+\item{title}{Title for the plot.}
 }
 \value{
 lollipop plot
