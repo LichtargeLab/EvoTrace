@@ -7,10 +7,10 @@
 AA3to1 <- function(AA) {
   AA3 <- c("HIS", "PRO", "GLU", "THR", "LEU", "VAL", "LYS", "ASP", "ALA",
            "GLN", "GLY", "ARG", "TYR", "ILE", "ASN", "SER", "PHE", "MET",
-           "CYS", "TRP", "MSE")
+           "CYS", "TRP", "MSE", "TER")
   AA1 <- c("H", "P", "E", "T", "L", "V", "K", "D", "A",
            "Q", "G", "R", "Y", "I", "N", "S", "F", "M",
-           "C", "W", "M")
+           "C", "W", "M", "X")
   names(AA1) <- AA3
   output <- AA1[toupper(AA)]
   names(output) <- NULL
