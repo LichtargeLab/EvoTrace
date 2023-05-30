@@ -8,7 +8,8 @@ Color_Variants_AlphaFold(
   variants_case,
   variants_ctrl = NULL,
   prot_id,
-  pml_output
+  pml_output,
+  output_format = c("pml", "pse")
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ range of (0, 100].}
 Use locus tag for E. coli MG1655 proteins, eg. b4112.}
 
 \item{pml_output}{Path to store the pymol command file.}
+
+\item{output_format}{Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
+be accessble from terminal with "pymol".}
 }
 \value{
 A tibble that contains the coloring information. The pml file will

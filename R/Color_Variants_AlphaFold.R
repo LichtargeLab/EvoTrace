@@ -8,6 +8,8 @@
 #' @param pml_output Path to store the pymol command file.
 #' @param prot_id Protein identification. Use full ENSP for human proteins, eg. ENSP00000388638.1.
 #' Use locus tag for E. coli MG1655 proteins, eg. b4112.
+#' @param output_format Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
+#' be accessble from terminal with "pymol".
 #' @return A tibble that contains the coloring information. The pml file will
 #' be written to the location indicated by pml_output.
 #' @description Map variants and ET scores to AlphaFold structures. Pymol is required to view the pml
@@ -15,7 +17,8 @@
 #' @export
 
 Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
-                                     prot_id, pml_output) {
+                                     prot_id, pml_output, output_format = c("pml", "pse")) {
+  output_format <- match.arg(output_format)
   if ((sum(c("SUB", "EA") %in% names(variants_case))) < 2) {
     stop("variants_case df should contain these cols: SUB, EA")
   }
@@ -118,7 +121,11 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
     pymol_color_df <- pymol_color_df %>%
       mutate(EA_ctrl = NA, EA_ctrl_color = NA)
   }
-  writeLines(pymol_cmd, con = pml_output)
+  if (output_format == "pml") {
+    writeLines(pymol_cmd, con = pml_output)
+  } else if (output_format == "pse") {
+    PymolExecuteAndSave(pymol_cmd = pymol_cmd, output_file = pml_output)
+  }
   return(pymol_color_df)
 }
 
