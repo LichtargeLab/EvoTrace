@@ -170,11 +170,11 @@ PymolColorPairs <- function(chain1, position1,
 
 #' @export
 PymolColorPairs_2 <- function(chain1, position1,
-                            chain2, position2,
-                            pair_coverage,
-                            color_type = c("ET", "red_white", "red_white_blue"),
-                            group_name = "pairs",
-                            pair_coverage_cutoff = NULL) {
+                              chain2, position2,
+                              pair_coverage,
+                              color_type = c("ET", "red_white", "red_white_blue"),
+                              group_name = "pairs",
+                              pair_coverage_cutoff = NULL) {
   colorRange <- SelectColor(color_type = color_type, prefix = "0x")
   if (is.null(pair_coverage_cutoff)) {
     pair_coverage_cutoff <- max(pair_coverage)
