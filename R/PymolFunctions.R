@@ -28,6 +28,54 @@ PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
   return(workdf$pymol_cmd)
 }
 
+#' Pymol color residues in a given chain using ET
+#'
+#' @param chain The chain in the pymol session that needs to be colored. Input can
+#' be a vector with all the chains that need to be colored.
+#' @param poistion A numeric vector specifying the residues that needs to be
+#' colored
+#' @param coverage A double vector for residue ET coverage, range (0,1]
+#' @param object A given object in the pymol session that needs to be colored. If is
+#' NULL, then all object in the pymol session will be colored.
+#' @param color_type The type of color range to use. Available selections: "ET",
+#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_sacle", "EA_bin".
+#' @param coverage_cutoff Only residue below this cutoff will be colored.
+#' @return A string vector with pymol commands
+#' @description Produce pymol commands to color residues in given chains using ET coverage. This function should
+#' be used in combination with PymolLoadFile and PymolExecuteAndSave. Combine PymolLoadFile and
+#' all other pymol cmds with c(), then pipe into PymolExecuteAndSave.
+#' @export
+PymolColorChainByET<- function(chain, position, coverage, color_type,
+                               object = NULL, coverage_cutoff = NULL) {
+  if (!is.null(coverage_cutoff)) {
+    idx <- coverage <= coverage_cutoff
+  } else {
+    idx <- 1:length(coverage)
+  }
+
+  position <- position[idx]
+  coverage <- coverage[idx]
+
+  colorRange <- SelectColor(color_type = color_type, prefix = "0x")
+
+  color <- colorRange[ceiling(coverage*100)]
+
+  if(is.null(object)) {
+    object_cmd <- ""
+  } else {
+    object_cmd <- paste0(object, " and ")
+  }
+  chain_cmd <- paste0("chain ", chain)
+  chain_cmd <- paste0(chain_cmd, collapse = " or ")
+  workdf <- tibble(position, color) %>%
+    group_by(color) %>%
+    summarize(position = paste0(position, collapse = "+")) %>%
+    mutate(pymol_cmd = glue::glue("color {color}, {object_cmd}({chain_cmd}) and resi {position}"))
+  return(workdf$pymol_cmd)
+}
+
+
+
 #' Pymol select residues
 #'
 #' @param chain The chain in the pymol session that needs to be selected. Input can
@@ -168,13 +216,31 @@ PymolColorPairs <- function(chain1, position1,
   return(output_cmd)
 }
 
+
+#' Pymol color residue interaction using CovET
+#'
+#' @param chain1 Chain ID for the first set of residues
+#' @param poistion1 A numeric vector specifying one side of the interacting
+#' residues
+#' @param chain2 Chain ID for the first set of residues
+#' @param poistion2 A numeric vector specifying the other side of the interacting
+#' residues
+#' @param coverage A double vector for residue pair CovET coverage, range (0,1]
+#' @param color_type The type of color range to use. Available selections: "ET",
+#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_sacle", "EA_bin".
+#' @param group_name Pymol group name to combine all the interactions.
+#' @param pair_coverage_cutoff Only residue pairs below this cutoff will be shown.
+#' @return A string vector with pymol commands
+#' @description Produce pymol commands to color residues in given chains using ET coverage. This function should
+#' be used in combination with PymolLoadFile and PymolExecuteAndSave. Combine PymolLoadFile and
+#' all other pymol cmds with c(), then pipe into PymolExecuteAndSave.
 #' @export
-PymolColorPairs_2 <- function(chain1, position1,
-                              chain2, position2,
-                              pair_coverage,
-                              color_type = c("ET", "red_white", "red_white_blue"),
-                              group_name = "pairs",
-                              pair_coverage_cutoff = NULL) {
+PymolColorPairsByCovET <- function(chain1, position1,
+                                   chain2, position2,
+                                   pair_coverage,
+                                   color_type = c("ET", "red_white", "red_white_blue"),
+                                   group_name = "pairs",
+                                   pair_coverage_cutoff = NULL) {
   colorRange <- SelectColor(color_type = color_type, prefix = "0x")
   if (is.null(pair_coverage_cutoff)) {
     pair_coverage_cutoff <- max(pair_coverage)
