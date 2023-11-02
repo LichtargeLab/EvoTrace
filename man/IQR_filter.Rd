@@ -4,13 +4,15 @@
 \alias{IQR_filter}
 \title{Apply 1.5 IQR filter for a given numeric vector}
 \usage{
-IQR_filter(x, type = c("bool", "ends"))
+IQR_filter(x, type = c("bool", "ends"), fold = 1.5)
 }
 \arguments{
 \item{x}{A given numeric vector to apply the filter}
 
 \item{type}{If "bool" is used, them a boolean vector with the same length as x is returned.
 If "ends" is used, then the lower and upper boundaries are returned}
+
+\item{fold}{Fold of IQR when computing the upper and lower boundaries.}
 }
 \value{
 A boolean vector or the lower and upper boundaries
