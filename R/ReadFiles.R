@@ -1,21 +1,44 @@
 #' Read legacy ET format
 #'
 #' @param ET_file Path to ET file
+#' @param ET_format EA format or UET format.
 #' @return a dataframe(tibble) with all the columns from ET output
-#' @description Read legacy ET file and output a tibble
+#' @description Read legacy ET file and output a tibble. Support output
+#' from EA calculation and UET server.
 #' @export
-ReadET <- function(ET_file) {
-  ET.lines <- read_lines(ET_file)
-  if(length(ET.lines) == 0) {
+ReadET <- function(ET_file, ET_format = c("EA", "UET")) {
+  ET_format <- match.arg(ET_format)
+  ET_lines <- readLines(ET_file)
+  if(length(ET_lines) == 0) {
     return(NA)
   } else {
-    ET.df <- ET.lines %>%
-      .[!str_detect(., "%")] %>%
-      I(.) %>%
-      read_fwf(fwf_cols(align.num = 10, POS = 10, AA = 10, rank = 10,
-                        vari.n = 10, vari = 22, rho = 10, coverage = 10),
-               col_types = "ndcddcdd")
-    return(ET.df)
+    empty_lines <- ET_lines == ""
+    header_lines <- grepl("%", ET_lines)
+    skip_lines <- empty_lines | header_lines
+    entry_line_count <- sum(1 - skip_lines)
+    skip_lines <- which(skip_lines == FALSE)[1]
+    if (ET_format == "EA") {
+      ET_df <- read.fwf(file = ET_file,
+                        skip = skip_lines - 1,
+                        col.names = c("align.num", "POS", "AA",
+                                      "rank", "vari.n", "vari",
+                                      "rho", "coverage"),
+                        widths = c(10,10,10,10,10,22,10,10),
+                        strip.white = TRUE, nrow = entry_line_count)
+    } else {
+      ET_df <- read.fwf(file = ET_file,
+                        skip = skip_lines - 1,
+                        col.names = c("align.num", "POS", "AA",
+                                      "coverage", "vari.n", "vari",
+                                      "rho"),
+                        widths = c(10,10,10,10,10,22,10),
+                        strip.white = TRUE, nrow = entry_line_count)
+      ET_df$rank <- rank(ET_df$rho, ties.method = "max")
+      ET_df <- ET_df[,c("align.num", "POS", "AA",
+                        "rank", "vari.n", "vari",
+                        "rho", "coverage")]
+    }
+    return(ET_df)
   }
 }
 

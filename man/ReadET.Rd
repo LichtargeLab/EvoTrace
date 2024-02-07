@@ -4,14 +4,17 @@
 \alias{ReadET}
 \title{Read legacy ET format}
 \usage{
-ReadET(ET_file)
+ReadET(ET_file, ET_format = c("EA", "UET"))
 }
 \arguments{
 \item{ET_file}{Path to ET file}
+
+\item{ET_format}{EA format or UET format.}
 }
 \value{
 a dataframe(tibble) with all the columns from ET output
 }
 \description{
-Read legacy ET file and output a tibble
+Read legacy ET file and output a tibble. Support output
+from EA calculation and UET server.
 }
