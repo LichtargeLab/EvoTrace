@@ -17,8 +17,8 @@ Depends:
     readr,
     purrr,
     tidyr,
-    R (>= 2.10),
-    ggplot2
+    R (>= 4.0),
+    ggplot2 (== 3.4.0)
 Imports: 
     glue,
     Biostrings,
