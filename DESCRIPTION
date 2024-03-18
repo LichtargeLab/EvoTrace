@@ -9,7 +9,7 @@ Description: More about what it does (maybe more than one line)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 biocViews:
 Depends: 
     dplyr,
@@ -18,7 +18,7 @@ Depends:
     purrr,
     tidyr,
     R (>= 4.0),
-    ggplot2 (== 3.4.0)
+    ggplot2 (>= 3.4.0)
 Imports: 
     glue,
     Biostrings,

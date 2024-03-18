@@ -112,8 +112,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   # Generate ET plot
   ET_plot <- ggplot(ET) +
     geom_col(aes(x = AA_POS, y = 1, fill = color), width = 1) +
-    geom_segment(aes(x=0.5, xend= max(AA_POS)+0.5, y=0, yend=0), linewidth = 1) +
-    geom_segment(aes(x=0.5, xend= max(AA_POS)+0.5, y=1, yend=1), linewidth = 1) +
+    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=0, linewidth = 1) +
+    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=1, yend=1, linewidth = 1) +
     scale_fill_manual(values = GetManualColor(ET$color)) +
     scale_y_continuous(expand = c(0, 0)) +
     xlim(0, max(ET$AA_POS) + 1) +
@@ -165,8 +165,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
     # geom_point(aes(x=AA_POS, y=y_var, color = color), size = 2) +
     # geom_point(aes(x=AA_POS, y=y_var, alpha = EA), size = 2, color = "black", fill = "black") +
     xlim(0, max(ET$AA_POS) + 1) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2)) +
-    guides(y = guide_axis_truncated(trunc_lower = 0, trunc_upper = max_lim_case*1.2)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2),
+                       breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
     scale_size(range = c(2, 4)) +
     scale_color_manual(values = GetManualColor(mut_case$color)) +
@@ -189,8 +189,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
     pop +
     # geom_point(aes(x=AA_POS, y=y_var, color = color), size = 2) +
     # geom_point(aes(x=AA_POS, y=y_var, alpha = EA), size = 2, color = "black", fill = "black") +
-    scale_y_reverse(expand = expansion(mult = c(0, 0)), limits = c(max_lim_ctrl*1.2, -pad_ctrl)) +
-    guides(y = guide_axis_truncated(trunc_lower = 0, trunc_upper = max_lim_ctrl*1.2)) +
+    scale_y_reverse(expand = expansion(mult = c(0, 0)), limits = c(max_lim_ctrl*1.2, -pad_ctrl),
+                    breaks = pretty(x = c(0, max_lim_ctrl*1.2), n = 5)) +
     scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
                        breaks = scales::pretty_breaks(n = 10)) +
     y_label +
@@ -299,18 +299,6 @@ ParseDomain <- function(x) {
   return(output)
 }
 
-# Import guide_axis_truncated from ggh4x
-guide_axis_truncated <- function (title = waiver(), check.overlap = FALSE, angle = NULL,
-                                  n.dodge = 1, order = 0, colour = NULL, color = NULL, trunc_lower = min,
-                                  trunc_upper = max, position = waiver())
-{
-  colour <- color %||% colour
-  structure(list(title = title, check.overlap = check.overlap,
-                 angle = angle, n.dodge = n.dodge, order = order, trunc_lower = trunc_lower,
-                 trunc_upper = trunc_upper, colour = colour, position = position,
-                 available_aes = c("x", "y"), name = "axis"), class = c("guide",
-                                                                        "axis_ggh4x", "axis"))
-}
 
 # Import theme_nothing from cowplot
 theme_nothing <- function (font_size = 14, font_family = "", rel_small = 12/14)

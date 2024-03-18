@@ -90,8 +90,8 @@ LollipopPlot <- function(variants,
   # Generate ET plot
   ET_plot <- ggplot(ET) +
     geom_col(aes(x = AA_POS, y = 1, fill = color), width = 1) +
-    geom_segment(aes(x=0.5, xend= max(AA_POS)+0.5, y=0, yend=0), linewidth = 1) +
-    geom_segment(aes(x=0.5, xend= max(AA_POS)+0.5, y=1, yend=1), linewidth = 1) +
+    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=0, linewidth = 1) +
+    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=1, yend=1, linewidth = 1) +
     scale_fill_manual(values = GetManualColor(ET$color)) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
@@ -131,8 +131,8 @@ LollipopPlot <- function(variants,
     geom_segment(aes(x=AA_POS, xend=AA_POS, y=0-pad_case, yend=y_var), linewidth = 0.5) +
     pop +
     xlim(0, max(ET$AA_POS) + 1) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2)) +
-    guides(y = guide_axis_truncated(trunc_lower = 0, trunc_upper = max_lim_case*1.2)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2),
+                       breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
     scale_size(range = c(2, 4)) +
     scale_color_manual(values = GetManualColor(mut_case$color)) +
