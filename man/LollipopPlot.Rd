@@ -14,7 +14,8 @@ LollipopPlot(
   fix_scale = TRUE,
   domain_min_dist = 0,
   pad_ratio = 0.1,
-  title = NULL
+  title = NULL,
+  add_legend = TRUE
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ If domain annotations overlap, set to a larger value.}
 Use larger values for larger space.}
 
 \item{title}{Title for the plot.}
+
+\item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
 }
 \value{
 lollipop plot

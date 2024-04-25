@@ -19,6 +19,7 @@
 #' If the distance between two domains are less than domain_min_dist, they will be plotted in separate lines.
 #' If domain annotations overlap, set to a larger value.
 #' @param title Title for the plot.
+#' @param add_legend Whether to include ET/EA legends at the bottom of the plot.
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to show mutational profile in a given gene. The center ET track is colored as prismatic style, with the most important
 #' ET positions as red. The height of the lollipops reflects allele count. The color and/or size of the
@@ -56,7 +57,8 @@ LollipopPlot <- function(variants,
                          fix_scale = TRUE,
                          domain_min_dist = 0,
                          pad_ratio = 0.1,
-                         title = NULL) {
+                         title = NULL,
+                         add_legend = TRUE) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
   if ((sum(c("SUB", "EA", "AC") %in% names(variants))) < 3) {
@@ -92,7 +94,7 @@ LollipopPlot <- function(variants,
     geom_col(aes(x = AA_POS, y = 1, fill = color), width = 1) +
     annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=0, linewidth = 1) +
     annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=1, yend=1, linewidth = 1) +
-    scale_fill_manual(values = GetManualColor(ET$color)) +
+    scale_fill_identity() +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
                        breaks = scales::pretty_breaks(n = 10)) +
@@ -135,7 +137,7 @@ LollipopPlot <- function(variants,
                        breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
     scale_size(range = c(2, 4)) +
-    scale_color_manual(values = GetManualColor(mut_case$color)) +
+    scale_color_identity() +
     theme_classic(base_size = 12) +
     theme(line = element_line(linewidth = 1),
           plot.margin = margin(t = 10, r = 0, b = 0, l = 10),
@@ -154,8 +156,8 @@ LollipopPlot <- function(variants,
     domain <- id_map[id_map$prot_id == prot_id,]
     if (is.na(domain$domain) == TRUE) {
       cat("No domain information for this protein.")
-      output <- egg::ggarrange(mut_case_plot, ET_plot,
-                               ncol = 1, heights = c(10,1), draw = FALSE, top = title_grob)
+      domain_plot <- NA
+      domain_plot_height <- NA
     } else {
       domain <- id_map[id_map$prot_id == prot_id,] %>%
         mutate(domain_df = str_split(domain, "; ", simplify = FALSE)) %>%
@@ -164,7 +166,7 @@ LollipopPlot <- function(variants,
         unnest(cols = c(domain_df)) %>%
         mutate(group = AssignNonOverlapGroup(start, end, min_dist = domain_min_dist))
 
-      domian_plot_height <- (max(domain$group+0.5) - 1) * 3
+      domain_plot_height <- (max(domain$group+0.5) - 1) * 3
 
       domain_plot <- ggplot(domain) +
         geom_rect(aes(xmin = start, xmax = end, ymin = group, ymax = group + 0.5), fill = "gray90", color = "gray30") +
@@ -173,13 +175,38 @@ LollipopPlot <- function(variants,
         ylim(1, max(domain$group+0.5)) +
         theme_nothing() +
         theme(plot.margin = margin(t = 10, r = 0, b = 0, l = 10))
-
-      output <- egg::ggarrange(domain_plot, mut_case_plot, ET_plot,
-                               ncol = 1, heights = c(domian_plot_height,10,1), draw = FALSE, top = title_grob)
     }
   } else {
-    output <- egg::ggarrange(mut_case_plot, ET_plot,
-                             ncol = 1, heights = c(10,1), draw = FALSE, top = title_grob)
+    domain_plot <- NA
+    domain_plot_height <- NA
   }
+  c("prismatic", "gray_scale", "EA_bin", "black")
+  if (add_legend == TRUE) {
+    EA_legend <- switch(EA_color,
+                        "prismatic" = lolliplot_legend$legend.EA.prismatic,
+                        "gray_scale" = lolliplot_legend$legend.EA.gray,
+                        "EA_bin" = lolliplot_legend$legend.EA.bin,
+                        "black" = NA)
+    EA_legend_height <- ifelse(EA_color == "black",
+                               NA,
+                               0.8)
+    ET_legend <- lolliplot_legend$legend.ET
+    ET_legend_height <- 0.8
+  } else {
+    ET_legend <- NA
+    ET_legend_height <- NA
+    EA_legend <- NA
+    EA_legend_height <- NA
+  }
+
+  plot_list <- list(domain_plot, mut_case_plot, ET_plot, ET_legend, EA_legend)
+  plot_height <- c(domain_plot_height,10,1,ET_legend_height, EA_legend_height)
+
+  plot_list <- plot_list[!is.na(plot_list)]
+  plot_height <- plot_height[!is.na(plot_height)]
+
+  output <- egg::ggarrange(plots = plot_list,
+                           ncol = 1, heights = plot_height, draw = FALSE,
+                           top = title_grob)
   return(output)
 }

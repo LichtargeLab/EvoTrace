@@ -15,7 +15,8 @@ LollipopPlot2(
   fix_scale = TRUE,
   pad_ratio = 0.05,
   domain_min_dist = 0,
-  title = NULL
+  title = NULL,
+  add_legend = TRUE
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ If the distance between two domains are less than domain_min_dist, they will be 
 If domain annotations overlap, set to a larger value.}
 
 \item{title}{Title for the plot.}
+
+\item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
 }
 \value{
 lollipop plot
