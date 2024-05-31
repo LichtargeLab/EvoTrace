@@ -98,7 +98,7 @@ LollipopPlot <- function(variants,
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
                        breaks = scales::pretty_breaks(n = 10)) +
-    xlab("Amino acid poistion") +
+    xlab("Amino acid position") +
     scale_size(range = c(2, 4)) +
     theme_classic(base_size = 12) +
     theme(line = element_line(linewidth = 1),

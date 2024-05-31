@@ -196,7 +196,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
     scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
                        breaks = scales::pretty_breaks(n = 10)) +
     y_label +
-    xlab("Amino acid poistion") +
+    xlab("Amino acid position") +
     scale_size(range = c(2, 4)) +
     scale_color_identity() +
     theme_classic(base_size = 12) +
