@@ -5,6 +5,7 @@
 #' AC is allele count.
 #' @param prot_id Protein identification. Use ENSP id for human proteins and b number for E. coli
 #' proteins.
+#' @param prot_color Linear protein color. Default set as ET.
 #' @param plot_domain logical. When domain annotations are available, whether plot domain
 #' track.
 #' @param AC_scale Whether to use linear or log scale for allele count.
@@ -50,7 +51,8 @@
 
 
 LollipopPlot <- function(variants,
-                         prot_id, plot_domain = TRUE,
+                         prot_id, prot_color = "ET",
+                         plot_domain = TRUE,
                          AC_scale = c("log", "linear"),
                          show_EA_bin = TRUE,
                          EA_color = c("prismatic", "gray_scale", "EA_bin", "black"),
@@ -70,10 +72,16 @@ LollipopPlot <- function(variants,
     stop("No ET for this protein")
   }
 
-  # Fetch ET
-  ET <- FetchET(prot_id) %>%
-    dplyr::rename(AA_POS = POS, ET = coverage) %>%
-    mutate(color = SelectColor("ET")[ceiling(ET)])
+  if (prot_color == "ET") {
+    # Fetch ET
+    ET <- FetchET(prot_id) %>%
+      dplyr::rename(AA_POS = POS, ET = coverage) %>%
+      mutate(color = SelectColor("ET")[ceiling(ET)])
+  } else {
+    ET <- FetchET(prot_id) %>%
+      dplyr::rename(AA_POS = POS, ET = coverage) %>%
+      mutate(color = prot_color)
+  }
 
   variants <- variants %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
@@ -110,6 +118,11 @@ LollipopPlot <- function(variants,
           legend.position = "none"
     )
 
+  if (prot_color != "ET") {
+    ET_plot <- ET_plot +
+      annotate("segment", x=0.5, xend= 0.5, y=0, yend=1, linewidth = 0.5) +
+      annotate("segment", x=max(ET$AA_POS)+0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=1, linewidth = 0.5)
+  }
   # Generate variant plots
   mut_case <- PrepareMuts(variants, y_var = AC_scale, EA_color = EA_color)
 
@@ -190,8 +203,13 @@ LollipopPlot <- function(variants,
     EA_legend_height <- ifelse(EA_color == "black",
                                NA,
                                0.8)
-    ET_legend <- lolliplot_legend$legend.ET
-    ET_legend_height <- 0.8
+    if (prot_color == "ET") {
+      ET_legend <- lolliplot_legend$legend.ET
+      ET_legend_height <- 0.8
+    } else {
+      ET_legend <- NA
+      ET_legend_height <- NA
+    }
   } else {
     ET_legend <- NA
     ET_legend_height <- NA

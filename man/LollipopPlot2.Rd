@@ -8,6 +8,7 @@ LollipopPlot2(
   variants_case,
   variants_ctrl,
   prot_id,
+  prot_color = "ET",
   plot_domain = TRUE,
   AC_scale = c("log", "linear"),
   show_EA_bin = TRUE,
@@ -29,6 +30,8 @@ variants_case.}
 
 \item{prot_id}{Protein identification. Use ENSP id for human proteins and b number for E. coli
 proteins.}
+
+\item{prot_color}{Linear protein color. Default set as ET.}
 
 \item{plot_domain}{logical. When domain annotations are available, whether plot domain
 track.}
