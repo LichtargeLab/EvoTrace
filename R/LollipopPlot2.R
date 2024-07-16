@@ -23,6 +23,7 @@
 #' If the distance between two domains are less than domain_min_dist, they will be plotted in separate lines.
 #' If domain annotations overlap, set to a larger value.
 #' @param title Title for the plot.
+#' @param y_lab Label for y axis. Default "Allele Count".
 #' @param add_legend Whether to include ET/EA legends at the bottom of the plot.
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to compare mutational profile between cases and
@@ -70,6 +71,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
                           pad_ratio = 0.05,
                           domain_min_dist = 0,
                           title = NULL,
+                          y_lab = "Allele Count",
                           add_legend = TRUE) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
@@ -163,8 +165,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   }
 
   y_label <- switch(AC_scale,
-                    log = ylab(bquote('Log'[10]~'(Allele Count)')),
-                    linear = ylab("Allele Count"))
+                    log = ylab(bquote("Log"[10]*"("*.(y_lab)*")")),
+                    linear = ylab(y_lab))
 
   if (show_EA_bin == TRUE) {
     pop <- geom_point(aes(x=.data[["AA_POS"]], y=.data[["y_var"]],

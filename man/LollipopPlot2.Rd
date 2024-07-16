@@ -17,6 +17,7 @@ LollipopPlot2(
   pad_ratio = 0.05,
   domain_min_dist = 0,
   title = NULL,
+  y_lab = "Allele Count",
   add_legend = TRUE
 )
 }
@@ -55,6 +56,8 @@ If the distance between two domains are less than domain_min_dist, they will be 
 If domain annotations overlap, set to a larger value.}
 
 \item{title}{Title for the plot.}
+
+\item{y_lab}{Label for y axis. Default "Allele Count".}
 
 \item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
 }
