@@ -65,3 +65,74 @@ ReadFasta <- function(fasta_file, output_type = c("vector", "df")) {
   return(output)
 }
 
+#' Read Clustal MSA file
+#'
+#' @param clustal_path Path to MSA file
+#' @return A tibble format of the MSA. Each sequence is in one column, each cell is a residue.
+#' The position of each residue in each sequence is also returned. NA is returned in the position
+#' columns for gaps.
+#' @description Convert Clustal MSA file into a tibble
+#' @export
+ReadClustalMSA <- function(clustal_path) {
+  # Read each line as string then remove empty lines, skip header
+  clustal_raw <- read_lines(clustal_path, skip = 1)
+  clustal_raw <- clustal_raw[clustal_raw != ""]
+
+  # The trailing positions are separted from the sequences with tab in the example.
+  # The delim could also be space. Remove those
+  clustal_raw <- str_remove(clustal_raw, "(\t| )[:digit:]+")
+
+  # The remaining part is a fix width structure
+  # Add id to the symbol lines
+  str_sub(clustal_raw[str_starts(clustal_raw, "      ")], 1, 3) <- "symbol"
+
+  # Identify the position of the last space
+  last_space <- str_locate(clustal_raw, " +")[1, "end"]
+
+  # Read fixed width lines into dataframe
+  clustal_df <- read_fwf(I(clustal_raw),
+                         fwf_cols(id = c(1, last_space), seq = c(last_space + 1, nchar(clustal_raw[1]))),
+                         col_types = "cc",
+                         trim_ws = FALSE) %>%
+    mutate(id = str_remove_all(id, " ")) %>%
+    # Collapse sequences for each id
+    group_by(id) %>%
+    summarize(seq = paste0(seq, collapse = ""),
+              .groups = "drop")
+
+  # Get the squence names
+  seq_names <- clustal_df$id[1:(nrow(clustal_df) - 1)]
+
+  # Convert to vector
+  clustal_vec <- clustal_df$seq
+  names(clustal_vec) <- clustal_df$id
+
+  # Split vector by charachters, and convert to dataframe
+  output <- str_split(clustal_vec, pattern = "", simplify = TRUE) %>%
+    t() %>%
+    as.data.frame()
+  names(output) <- names(clustal_vec)
+
+  # This function takes a broken down sequence and return the position for
+  # each residue. Gaps return NAs.
+  GetPosition <- function(vec) {
+    # mark non-gap positions
+    vec_bool <- vec != "-"
+    # residue position +1 if for non-gap
+    vec_out <- cumsum(vec_bool)
+    vec_out[vec_bool == FALSE] <- NA
+    return(vec_out)
+  }
+
+  output <- output %>%
+    # Get the residue positions for each sequence
+    mutate(across(all_of(seq_names), GetPosition, .names = "{.col}_POS")) %>%
+    # Rearrange the column orders
+    relocate(ends_with("POS")) %>%
+    relocate(starts_with(seq_names)) %>%
+    # Replace space as NA in the symbol column.
+    mutate(symbol = ifelse(symbol == " ",
+                           NA,
+                           symbol))
+  return(output)
+}
