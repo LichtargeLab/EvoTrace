@@ -20,7 +20,7 @@ be a vector with all the chains that need to be colored.}
 \item{coverage}{A double vector for residue ET coverage, range (0,1]}
 
 \item{color_type}{The type of color range to use. Available selections: "ET",
-"red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_sacle", "EA_bin".}
+"red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_scale", "EA_bin".}
 
 \item{object}{A given object in the pymol session that needs to be colored. If is
 NULL, then all object in the pymol session will be colored.}

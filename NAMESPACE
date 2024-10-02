@@ -2,6 +2,7 @@
 
 export(AA3to1)
 export(AssignNonOverlapGroup)
+export(ColorPDBByET)
 export(Color_Variants_AlphaFold)
 export(CompareLinearSeqs)
 export(CompareSeqs)
