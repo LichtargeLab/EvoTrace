@@ -120,7 +120,7 @@ PymolLoadFile <- function(input_file) {
 #' @export
 PymolColorChainSingleColor <- function(chain = NULL, color = "white") {
   if(is.null(chain)) {
-    output <- glue::glue("color white")
+    output <- glue::glue("color {color}")
   } else {
     output <- glue::glue("color {color}, chain {chain}")
   }

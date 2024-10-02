@@ -11,14 +11,15 @@ ColorPDBByET(
   ET_file,
   color_type = c("ET", "red_white", "red_white_blue", "gray_scale"),
   coverage_cutoff = 1,
+  remaining_color = "white",
   output_file,
   output_format = c("pml", "pse")
 )
 }
 \arguments{
-\item{pdb_file}{Path to pdb file. Can be path to local file or url ("https://files.rcsb.org/view/1xb7.pdb").}
+\item{pdb_file}{Path to pdb or pse file. Can be path to local file or url ("https://files.rcsb.org/view/1xb7.pdb").}
 
-\item{chain}{The chain in the pymol session that needs to be colored.}
+\item{chain}{The chain in the pymol session that needs to be colored. Can provide multiple chains as a vector.}
 
 \item{ET_format}{Specify the ET file format. "UET" for ET server, "EA" for ET in EA output, and "ENSP"
 for precalculated ET scores from EA VEP output.}
@@ -34,6 +35,10 @@ for precalculated ET scores from EA VEP output.}
 
 \item{output_format}{Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
 be accessible from terminal with "pymol".}
+
+\item{other_color}{Color for the remaining chain. Default "white". If set to NULL, color
+are not adjusted for those chains. To color heterodimer, color the first chain with other_color as "white" and
+save as pse. Then color the second chain using the pse file with other_color = NULL to retain the first chain color.}
 
 \item{pml_output}{Path to store the pymol command file.}
 }
