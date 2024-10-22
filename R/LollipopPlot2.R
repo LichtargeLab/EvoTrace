@@ -25,6 +25,8 @@
 #' @param title Title for the plot.
 #' @param y_lab Label for y axis. Default "Allele Count".
 #' @param add_legend Whether to include ET/EA legends at the bottom of the plot.
+#' @param return_individual_plots If TRUE, individual tracks from the lollipop plot is return. This is useful
+#' when aligning extract track to the plot.
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to compare mutational profile between cases and
 #' controls in a given gene. The center ET track is colored as prismatic style, with the most important
@@ -72,7 +74,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
                           domain_min_dist = 0,
                           title = NULL,
                           y_lab = "Allele Count",
-                          add_legend = TRUE) {
+                          add_legend = TRUE,
+                          return_individual_plots = FALSE) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
   if ((sum(c("SUB", "EA", "AC") %in% names(variants_case))) < 3) {
@@ -287,9 +290,13 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   plot_list <- plot_list[!is.na(plot_list)]
   plot_height <- plot_height[!is.na(plot_height)]
 
-  output <- egg::ggarrange(plots = plot_list,
-                           ncol = 1, heights = plot_height, draw = FALSE,
-                           top = title_grob)
+  if (return_individual_plots == FALSE) {
+    output <- egg::ggarrange(plots = plot_list,
+                             ncol = 1, heights = plot_height, draw = FALSE,
+                             top = title_grob)
+  } else {
+    output <- list(plots = plot_list, heights = plot_height, top = title_grob)
+  }
   return(output)
 }
 

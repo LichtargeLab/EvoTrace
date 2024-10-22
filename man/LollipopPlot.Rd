@@ -16,7 +16,8 @@ LollipopPlot(
   domain_min_dist = 0,
   pad_ratio = 0.1,
   title = NULL,
-  add_legend = TRUE
+  add_legend = TRUE,
+  return_individual_plots = FALSE
 )
 }
 \arguments{
@@ -51,6 +52,9 @@ Use larger values for larger space.}
 \item{title}{Title for the plot.}
 
 \item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
+
+\item{return_individual_plots}{If TRUE, individual tracks from the lollipop plot is return. This is useful
+when aligning extract track to the plot.}
 }
 \value{
 lollipop plot

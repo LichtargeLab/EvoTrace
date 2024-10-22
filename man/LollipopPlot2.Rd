@@ -18,7 +18,8 @@ LollipopPlot2(
   domain_min_dist = 0,
   title = NULL,
   y_lab = "Allele Count",
-  add_legend = TRUE
+  add_legend = TRUE,
+  return_individual_plots = FALSE
 )
 }
 \arguments{
@@ -60,6 +61,9 @@ If domain annotations overlap, set to a larger value.}
 \item{y_lab}{Label for y axis. Default "Allele Count".}
 
 \item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
+
+\item{return_individual_plots}{If TRUE, individual tracks from the lollipop plot is return. This is useful
+when aligning extract track to the plot.}
 }
 \value{
 lollipop plot

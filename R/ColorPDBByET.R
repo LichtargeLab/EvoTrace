@@ -78,7 +78,7 @@ ColorPDBByET <- function(pdb_file, chain, ET_format = c("EA", "UET", "ENSP"),
   if (output_format == "pml") {
     writeLines(pymol_cmd, con = output_file)
   } else if (output_format == "pse") {
-    PymolExecuteAndSave(pymol_cmd = pymol_cmd, output_file = pml_output)
+    PymolExecuteAndSave(pymol_cmd = pymol_cmd, output_file = output_file)
   }
   return(align_df)
 }
