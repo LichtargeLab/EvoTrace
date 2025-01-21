@@ -315,9 +315,9 @@ PrepareMuts <- function(df, y_var = c("log", "linear"), EA_color) {
   if (EA_color == "prismatic") {
     output$color <- GetColor((100.001-output$EA), lower_bound = 0, upper_bound = 100, color = "ET")
   } else if (EA_color == "gray_scale") {
-    output$color <- GetColor((output$EA+0.001), lower_bound = 0, upper_bound = 100, color = "gray_scale")
+    output$color <- GetColor((output$EA), lower_bound = 0, upper_bound = 100, color = "gray_scale")
   } else if (EA_color == "EA_bin") {
-    output$color <- GetColor((output$EA+0.001), lower_bound = 0, upper_bound = 100, color = "EA_bin")
+    output$color <- GetColor((output$EA), lower_bound = 0, upper_bound = 100, color = "EA_bin")
   } else if (EA_color == "black") {
     output$color <- "black"
   }
