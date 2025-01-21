@@ -7,9 +7,11 @@
 SUB3to1 <- function(SUB) {
   ref <- str_sub(SUB, 1, 3) %>%
     AA3to1()
-  pos <- str_sub(SUB, 4, -4)
-  alt <- str_sub(SUB, -3, -1) %>%
+  pos_loc <- str_locate(SUB, "[:digit:]+")
+  pos <- str_sub(SUB, pos_loc[,1], pos_loc[,2])
+  alt <- str_sub(SUB, pos_loc[,2] + 1, pos_loc[,2] + 3) %>%
     AA3to1()
-  output <- paste0(ref, pos, alt)
+  trailing <- str_sub(SUB, pos_loc[,2] + 4, -1)
+  output <- paste0(ref, pos, alt, trailing)
   return(output)
 }
