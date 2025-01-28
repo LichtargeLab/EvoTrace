@@ -21,6 +21,10 @@
 #' If domain annotations overlap, set to a larger value.
 #' @param title Title for the plot.
 #' @param add_legend Whether to include ET/EA legends at the bottom of the plot.
+#' @param AA_start The starting residue position for the lollipop plot. Default NA, 1 is used.
+#' AA_start - 1 is used as the xlim start.
+#' @param AA_end The ending residue position for the lollipop plot. Default NA, max(AA_POS) is used.
+#' AA_end + 1 is used as the xlim end.
 #' @param return_individual_plots If TRUE, individual tracks from the lollipop plot is return. This is useful
 #' when aligning extract track to the plot.
 #' @return lollipop plot
@@ -63,6 +67,8 @@ LollipopPlot <- function(variants,
                          pad_ratio = 0.1,
                          title = NULL,
                          add_legend = TRUE,
+                         AA_start = NA,
+                         AA_end = NA,
                          return_individual_plots = FALSE) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
@@ -86,6 +92,27 @@ LollipopPlot <- function(variants,
       mutate(color = prot_color)
   }
 
+  # if NA, use 1 for AA_start and max(ET$AA_POS) for AA_end
+  if (is.na(AA_start)) {
+    AA_start <- 1
+  }
+  if (is.na(AA_end)) {
+    AA_end <- max(ET$AA_POS)
+  }
+  if (AA_start < 1) {
+    stop("AA_start should be larger than AA_end")
+  }
+  if (AA_start >= AA_end) {
+    stop("AA_start should be smaller than AA_end")
+  }
+  if (AA_start > max(ET$AA_POS)) {
+    stop("AA_start should be smaller than protein length")
+  }
+
+  if (AA_end > max(ET$AA_POS) ) {
+    stop("AA_end should be smaller than protein length")
+  }
+
   variants <- variants %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
            AA_POS = as.numeric(str_extract(SUB, "[[:digit:]]+"))) %>%
@@ -101,13 +128,15 @@ LollipopPlot <- function(variants,
 
 
   # Generate ET plot
-  ET_plot <- ggplot(ET) +
+  ET_plot <- ET %>%
+    filter(AA_POS <= AA_end, AA_POS >= AA_start) %>%
+    ggplot() +
     geom_col(aes(x = AA_POS, y = 1, fill = color), width = 1) +
-    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=0, linewidth = 1) +
-    annotate("segment", x=0.5, xend= max(ET$AA_POS)+0.5, y=1, yend=1, linewidth = 1) +
+    annotate("segment", x=AA_start - 0.5, xend= AA_end + 0.5, y=0, yend=0, linewidth = 1) +
+    annotate("segment", x=AA_start - 0.5, xend= AA_end + 0.5, y=1, yend=1, linewidth = 1) +
     scale_fill_identity() +
     scale_y_continuous(expand = c(0, 0)) +
-    scale_x_continuous(position = "bottom", limits = c(0, max(ET$AA_POS) + 1),
+    scale_x_continuous(position = "bottom", limits = c(AA_start - 1, AA_end + 1),
                        breaks = scales::pretty_breaks(n = 10)) +
     xlab("Amino acid position") +
     scale_size(range = c(2, 4)) +
@@ -123,8 +152,8 @@ LollipopPlot <- function(variants,
 
   if (prot_color != "ET") {
     ET_plot <- ET_plot +
-      annotate("segment", x=0.5, xend= 0.5, y=0, yend=1, linewidth = 0.5) +
-      annotate("segment", x=max(ET$AA_POS)+0.5, xend= max(ET$AA_POS)+0.5, y=0, yend=1, linewidth = 0.5)
+      annotate("segment", x=AA_start - 0.5, xend= AA_start - 0.5, y=0, yend=1, linewidth = 0.5) +
+      annotate("segment", x=AA_end + 0.5, xend= AA_end + 0.5, y=0, yend=1, linewidth = 0.5)
   }
   # Generate variant plots
   mut_case <- PrepareMuts(variants, y_var = AC_scale, EA_color = EA_color)
@@ -145,10 +174,12 @@ LollipopPlot <- function(variants,
                           color = .data[["color"]]), size = 2)
   }
 
-  mut_case_plot <- ggplot(mut_case) +
+  mut_case_plot <- mut_case %>%
+    filter(AA_POS <= AA_end, AA_POS >= AA_start) %>%
+    ggplot() +
     geom_segment(aes(x=AA_POS, xend=AA_POS, y=0-pad_case, yend=y_var), linewidth = 0.5) +
     pop +
-    xlim(0, max(ET$AA_POS) + 1) +
+    xlim(AA_start - 1, AA_end + 1) +
     scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2),
                        breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
@@ -187,8 +218,7 @@ LollipopPlot <- function(variants,
       domain_plot <- ggplot(domain) +
         geom_rect(aes(xmin = start, xmax = end, ymin = group, ymax = group + 0.5), fill = "gray90", color = "gray30") +
         geom_text(aes(x = (start+end)/2, y = group + 0.25, label = domain), size = 3, color = "red") +
-        xlim(0, max(ET$AA_POS) + 1) +
-        ylim(1, max(domain$group+0.5)) +
+        coord_cartesian(xlim = c(AA_start - 1, AA_end + 1), ylim = c(1, max(domain$group+0.5))) +
         theme_nothing() +
         theme(plot.margin = margin(t = 10, r = 0, b = 0, l = 10))
     }

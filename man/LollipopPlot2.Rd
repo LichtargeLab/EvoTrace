@@ -19,6 +19,8 @@ LollipopPlot2(
   title = NULL,
   y_lab = "Allele Count",
   add_legend = TRUE,
+  AA_start = NA,
+  AA_end = NA,
   return_individual_plots = FALSE
 )
 }
@@ -61,6 +63,12 @@ If domain annotations overlap, set to a larger value.}
 \item{y_lab}{Label for y axis. Default "Allele Count".}
 
 \item{add_legend}{Whether to include ET/EA legends at the bottom of the plot.}
+
+\item{AA_start}{The starting residue position for the lollipop plot. Default NA, 1 is used.
+AA_start - 1 is used as the xlim start.}
+
+\item{AA_end}{The ending residue position for the lollipop plot. Default NA, max(AA_POS) is used.
+AA_end + 1 is used as the xlim end.}
 
 \item{return_individual_plots}{If TRUE, individual tracks from the lollipop plot is return. This is useful
 when aligning extract track to the plot.}
