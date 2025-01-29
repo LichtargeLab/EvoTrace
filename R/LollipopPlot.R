@@ -183,7 +183,7 @@ LollipopPlot <- function(variants,
     scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2),
                        breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
-    scale_size(range = c(2, 4)) +
+    scale_size_identity() +
     scale_color_identity() +
     theme_classic(base_size = 12) +
     theme(line = element_line(linewidth = 1),

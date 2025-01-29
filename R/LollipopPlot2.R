@@ -220,7 +220,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
     scale_y_continuous(expand = expansion(mult = c(0, 0)), limits = c(-pad_case, max_lim_case*1.2),
                        breaks = pretty(x = c(0, max_lim_case*1.2), n = 5)) +
     y_label +
-    scale_size(range = c(2, 4)) +
+    scale_size_identity() +
     scale_color_identity() +
     theme_classic(base_size = 12) +
     theme(line = element_line(linewidth = 1),
@@ -249,7 +249,7 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
                        breaks = scales::pretty_breaks(n = 10)) +
     y_label +
     xlab("Amino acid position") +
-    scale_size(range = c(2, 4)) +
+    scale_size_identity() +
     scale_color_identity() +
     theme_classic(base_size = 12) +
     theme(line = element_line(linewidth = 1),
@@ -343,8 +343,8 @@ PrepareMuts <- function(df, y_var = c("log", "linear"), EA_color) {
     mutate(AA_POS = str_extract(SUB, "[[:digit:]]+"),
            AA_POS = as.numeric(AA_POS)) %>%
     mutate(logAC = log10(AC)) %>%
-    mutate(EA_bin = ifelse(EA >= 70, 3,
-                           ifelse(EA >= 30, 2, 1)))
+    mutate(EA_bin = ifelse(EA >= 70, 4,
+                           ifelse(EA >= 30, 3, 2)))
   if (EA_color == "prismatic") {
     output$color <- GetColor((100.001-output$EA), lower_bound = 0, upper_bound = 100, color = "ET")
   } else if (EA_color == "gray_scale") {
