@@ -31,6 +31,8 @@
 #' AA_end + 1 is used as the xlim end.
 #' @param return_individual_plots If TRUE, individual tracks from the lollipop plot is return. This is useful
 #' when aligning extract track to the plot.
+#' @param interactive If TRUE, plotly is used to render an interactive plot. Interactive plot does
+#' not support ET/EA legends. AA_start and AA_end are also set to default.
 #' @return lollipop plot
 #' @description This function graphs a lollipop plot to compare mutational profile between cases and
 #' controls in a given gene. The center ET track is colored as prismatic style, with the most important
@@ -81,7 +83,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
                           add_legend = TRUE,
                           AA_start = NA,
                           AA_end = NA,
-                          return_individual_plots = FALSE) {
+                          return_individual_plots = FALSE,
+                          interactive = FALSE) {
   AC_scale <- match.arg(AC_scale)
   EA_color <- match.arg(EA_color)
   if ((sum(c("SUB", "EA", "AC") %in% names(variants_case))) < 3) {
@@ -91,6 +94,16 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   # Check if there is ET for this protein
   if (!prot_id %in% id_map$prot_id) {
     stop("No ET for this protein")
+  }
+
+  if (interactive) {
+    add_legend <- FALSE
+    return_individual_plots <- FALSE
+    AA_start <- NA
+    AA_end <- NA
+    if ("plotly" %in% installed.packages() == FALSE) {
+      stop("Please install plotly for interactive plot.")
+    }
   }
 
   if (prot_color == "ET") {
@@ -126,6 +139,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   }
 
 
+
+
   variants_case <- variants_case %>%
     mutate(AA_REF = str_sub(SUB, 1,1),
            AA_POS = as.numeric(str_extract(SUB, "[[:digit:]]+"))) %>%
@@ -155,8 +170,10 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   # Generate ET plot
   ET_plot <- ET %>%
     filter(AA_POS <= AA_end, AA_POS >= AA_start) %>%
+    mutate(Residue = paste0(AA, AA_POS)) %>%
     ggplot() +
-    geom_col(aes(x = AA_POS, y = 1, fill = color), width = 1) +
+    suppressWarnings(geom_col(aes(x = AA_POS, y = 1, fill = color,
+                                  text1 = Residue, test2 = ET), width = 1)) +
     annotate("segment", x=AA_start - 0.5, xend= AA_end + 0.5, y=0, yend=0, linewidth = 1) +
     annotate("segment", x=AA_start - 0.5, xend= AA_end + 0.5, y=1, yend=1, linewidth = 1) +
     scale_fill_identity() +
@@ -172,9 +189,11 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   }
 
   # Generate variant plots
-  mut_case <- PrepareMuts(variants_case, y_var = AC_scale, EA_color = EA_color)
+  mut_case <- PrepareMuts(variants_case, y_var = AC_scale, EA_color = EA_color) %>%
+    left_join(select(ET, AA_POS, ET), by = "AA_POS")
 
-  mut_ctrl <- PrepareMuts(variants_ctrl, y_var = AC_scale, EA_color = EA_color)
+  mut_ctrl <- PrepareMuts(variants_ctrl, y_var = AC_scale, EA_color = EA_color) %>%
+    left_join(select(ET, AA_POS, ET), by = "AA_POS")
 
   if (fix_scale == TRUE) {
     max_lim_case <- max(c(mut_case$y_var, mut_ctrl$y_var))
@@ -202,11 +221,13 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
                     linear = ylab(y_lab))
 
   if (show_EA_bin == TRUE) {
-    pop <- geom_point(aes(x=.data[["AA_POS"]], y=.data[["y_var"]],
-                          color = .data[["color"]], size = .data[["EA_bin"]]))
+    pop <- suppressWarnings(geom_point(aes(x=.data[["AA_POS"]], y=.data[["y_var"]],
+                                           color = .data[["color"]], size = .data[["EA_bin"]],
+                                           text1 = SUB, text2 = AC, text3 = EA, text4 = ET)))
   } else {
-    pop <- geom_point(aes(x=.data[["AA_POS"]], y=.data[["y_var"]],
-                          color = .data[["color"]]), size = 2)
+    pop <- suppressWarnings(geom_point(aes(x=.data[["AA_POS"]], y=.data[["y_var"]],
+                                           color = .data[["color"]], text1 = SUB, text2 = AC,
+                                           text3 = EA, text4 = ET), size = 2))
   }
 
   mut_case_plot <- mut_case %>%
@@ -283,7 +304,8 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
       domain_plot_height <- (max(domain$group+0.5) - 1) * 3
 
       domain_plot <- ggplot(domain) +
-        geom_rect(aes(xmin = start, xmax = end, ymin = group, ymax = group + 0.5), fill = "gray90", color = "gray30") +
+        suppressWarnings(geom_rect(aes(xmin = start, xmax = end, ymin = group, ymax = group + 0.5,
+                                       text1 = domain), fill = "gray90", color = "gray30")) +
         geom_text(aes(x = (start+end)/2, y = group + 0.25, label = domain), size = 3, color = "red") +
         coord_cartesian(xlim = c(AA_start - 1, AA_end + 1), ylim = c(1, max(domain$group+0.5))) +
         theme_nothing() +
@@ -296,10 +318,10 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   c("prismatic", "gray_scale", "EA_bin", "black")
   if (add_legend == TRUE) {
     EA_legend <- switch(EA_color,
-                            "prismatic" = lolliplot_legend$legend.EA.prismatic,
-                            "gray_scale" = lolliplot_legend$legend.EA.gray,
-                            "EA_bin" = lolliplot_legend$legend.EA.bin,
-                            "black" = NA)
+                        "prismatic" = lolliplot_legend$legend.EA.prismatic,
+                        "gray_scale" = lolliplot_legend$legend.EA.gray,
+                        "EA_bin" = lolliplot_legend$legend.EA.bin,
+                        "black" = NA)
     EA_legend_height <- ifelse(EA_color == "black",
                                NA,
                                0.8)
@@ -323,13 +345,42 @@ LollipopPlot2 <- function(variants_case, variants_ctrl,
   plot_list <- plot_list[!is.na(plot_list)]
   plot_height <- plot_height[!is.na(plot_height)]
 
-  if (return_individual_plots == FALSE) {
-    output <- egg::ggarrange(plots = plot_list,
-                             ncol = 1, heights = plot_height, draw = FALSE,
-                             top = title_grob)
+  if (interactive == FALSE) {
+    if (return_individual_plots == FALSE) {
+      output <- egg::ggarrange(plots = plot_list,
+                               ncol = 1, heights = plot_height, draw = FALSE,
+                               top = title_grob)
+    } else {
+      output <- list(plots = plot_list, heights = plot_height, top = title_grob)
+    }
   } else {
-    output <- list(plots = plot_list, heights = plot_height, top = title_grob)
+    ET_plotly <- plotly::ggplotly(ET_plot, tooltip = c("Residue", "ET"))
+    if (AC_scale == "log") {
+      mut_case_plotly <- {mut_case_plot +
+          ylab(paste0("Log<sub>10</sub> (", y_lab, ")"))} %>%
+        plotly::ggplotly(tooltip = c("SUB", "EA", "ET", "AC"))
+      mut_ctrl_plotly <- {mut_ctrl_plot +
+          ylab(paste0("Log<sub>10</sub> (", y_lab, ")"))} %>%
+        plotly::ggplotly(tooltip = c("SUB", "EA", "ET", "AC"))
+    } else {
+      mut_case_plotly <- plotly::ggplotly(mut_case_plot, tooltip = c("SUB", "EA", "ET", "AC"))
+      mut_ctrl_plotly <- plotly::ggplotly(mut_ctrl_plot, tooltip = c("SUB", "EA", "ET", "AC"))
+    }
+    if (is.na(domain_plot_height)) {
+      output <- plotly::subplot(mut_case_plotly, ET_plotly, mut_ctrl_plotly,
+                                shareX = TRUE, shareY = fix_scale, margin = 0,
+                                nrows = length(plot_height),
+                                heights = plot_height/sum(plot_height))
+    } else {
+      domain_plotly <- plotly::ggplotly(domain_plot, tooltip = c("domain"))
+      output <- plotly::subplot(domain_plotly,
+                                mut_case_plotly, ET_plotly, mut_ctrl_plotly,
+                                shareX = TRUE, shareY = fix_scale, margin = 0,
+                                nrows = length(plot_height),
+                                heights = plot_height/sum(plot_height))
+    }
   }
+
   return(output)
 }
 

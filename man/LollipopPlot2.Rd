@@ -21,7 +21,8 @@ LollipopPlot2(
   add_legend = TRUE,
   AA_start = NA,
   AA_end = NA,
-  return_individual_plots = FALSE
+  return_individual_plots = FALSE,
+  interactive = FALSE
 )
 }
 \arguments{
@@ -72,6 +73,9 @@ AA_end + 1 is used as the xlim end.}
 
 \item{return_individual_plots}{If TRUE, individual tracks from the lollipop plot is return. This is useful
 when aligning extract track to the plot.}
+
+\item{interactive}{If TRUE, plotly is used to render an interactive plot. Interactive plot does
+not support ET/EA legends. AA_start and AA_end are also set to default.}
 }
 \value{
 lollipop plot
