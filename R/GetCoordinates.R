@@ -100,6 +100,7 @@ GetCoordinates_pdb <- function(pdb_file, chain, CA_only = TRUE, remove_insertion
 GetCoordinates_cif <- function(pdb_file, chain, CA_only = TRUE, remove_insertions = TRUE) {
   pdb <- read_lines(pdb_file)
   info_lines <- which(str_sub(pdb, 1, 1) %in% c("_", "#"))
+  info_lines <- c(info_lines, length(pdb))
   header_start <- which(str_starts(pdb, "_atom_site.group_PDB"))
   header_end <- header_start
   while((header_end + 1) %in% info_lines) {
@@ -123,7 +124,21 @@ GetCoordinates_cif <- function(pdb_file, chain, CA_only = TRUE, remove_insertion
     I(.) %>%
     read_delim(., delim = " ", col_names = header,
                col_types = cols(.default = col_character())) %>%
-    filter(auth_asym_id %in% chain) %>%
+    filter(auth_asym_id %in% chain)
+
+  # When subseting pdb in pymol, auth_comp_id, auth_seq_id,
+  # auth_atom_id columns get removed
+  if (!"auth_comp_id" %in% names(output)) {
+    output[["auth_comp_id"]] <- output[["label_comp_id"]]
+  }
+  if (!"auth_seq_id" %in% names(output)) {
+    output[["auth_seq_id"]] <- output[["label_seq_id"]]
+  }
+  if (!"auth_atom_id" %in% names(output)) {
+    output[["auth_atom_id"]] <- output[["label_atom_id"]]
+  }
+
+  output <- output %>%
     filter(auth_comp_id %in% c("HIS", "PRO", "GLU", "THR", "LEU", "VAL", "LYS", "ASP", "ALA",
                                "GLN", "GLY", "ARG", "TYR", "ILE", "ASN", "SER", "PHE", "MET",
                                "CYS", "TRP", "MSE")) %>%
