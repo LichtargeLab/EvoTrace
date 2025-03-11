@@ -15,6 +15,7 @@
 #' @param output_file Path to write the output pymol file.
 #' @param output_format Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
 #' be accessible from terminal with "pymol".
+#' @param pdb_format Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.
 #' @return A tibble with the sequence alignment between the linear sequence in ET file and the sequence in
 #' the target chain in PDB.
 #' @description The function first align the linear sequence from the ET file to the sequence in PDB. PDB
@@ -29,10 +30,12 @@
 ColorPDBByET <- function(pdb_file, chain, ET_format = c("EA", "UET", "ENSP"),
                          ET_file, color_type = c("ET", "red_white", "red_white_blue", "gray_scale"),
                          coverage_cutoff = 1, remaining_color = "white",
-                         output_file, output_format = c("pml", "pse")) {
+                         output_file, output_format = c("pml", "pse"),
+                         pdb_format = c("pdb", "pdbx")) {
   ET_format <- match.arg(ET_format)
   color_type <- match.arg(color_type)
   output_format <- match.arg(output_format)
+  pdb_format <- match.arg(pdb_format)
 
   if (ET_format == "ENSP") {
     ET <- FetchET(ET_file)
@@ -47,7 +50,9 @@ ColorPDBByET <- function(pdb_file, chain, ET_format = c("EA", "UET", "ENSP"),
 
   align_df <- tibble(chain = chain) %>%
     mutate(data = map(chain, ~CompareSeqs(pdb_file = pdb_file, chain = .,
-                                          seq = paste0(ET$AA, collapse = ""), pos.only = FALSE))) %>%
+                                          seq = paste0(ET$AA, collapse = ""),
+                                          pos.only = FALSE,
+                                          pdb_format = pdb_format))) %>%
     unnest(cols = data) %>%
     left_join(select(ET, AA.POS.seq = POS, coverage), by = join_by(AA.POS.seq)) %>%
     select(chain, ends_with("AA.align"), align.POS, starts_with("AA.POS"), coverage)

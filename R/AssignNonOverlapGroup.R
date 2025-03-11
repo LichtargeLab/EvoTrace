@@ -38,7 +38,7 @@ AssignNonOverlapGroup <- function(start, end, min_dist = 0) {
   group <- rep(1, length(start))
   if (length(start) > 1) {
     # Starting from segment 2, check the distance
-    # between each group and targe segment
+    # between each group and target segment
     for (i in 2:length(start)) {
       set_dist <- map_dbl(group_list, ~min(filter(., id2 == i)$dist))
       # Assign to new group if all the distances are smaller than min_dist

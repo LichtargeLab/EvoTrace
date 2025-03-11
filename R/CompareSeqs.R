@@ -12,13 +12,18 @@
 #' sequence. The matching positions in the pdb entry and in the linear sequence are
 #' returned.
 #' @export
-CompareSeqs <- function(pdb_file, chain, seq, pos.only = TRUE, penalty = c("blastp", "pyETv")) {
-  pdb.df <- GetCoordinates(pdb_file = pdb_file, chain = chain, CA_only = TRUE) %>%
+CompareSeqs <- function(pdb_file, chain, seq,
+                        pos.only = TRUE, penalty = c("blastp", "pyETv"),
+                        pdb_format = c("pdb", "pdbx")) {
+  penalty <- match.arg(penalty)
+  pdb_format <- match.arg(pdb_format)
+
+  pdb.df <- GetCoordinates(pdb_file = pdb_file, chain = chain, CA_only = TRUE,
+                           pdb_format = pdb_format) %>%
     select(AA.pdb = AA, AA.POS.pdb = POS) %>%
     arrange(AA.POS.pdb)
   pdb.str <- pdb.df$AA.pdb %>%
     paste0(., collapse = "")
-  penalty <- match.arg(penalty)
   if(penalty == "blastp") {
     gap.open = 11
     gap.extend = 1

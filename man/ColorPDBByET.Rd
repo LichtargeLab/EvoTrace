@@ -13,7 +13,8 @@ ColorPDBByET(
   coverage_cutoff = 1,
   remaining_color = "white",
   output_file,
-  output_format = c("pml", "pse")
+  output_format = c("pml", "pse"),
+  pdb_format = c("pdb", "pdbx")
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ for precalculated ET scores from EA VEP output.}
 
 \item{output_format}{Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
 be accessible from terminal with "pymol".}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 
 \item{other_color}{Color for the remaining chain. Default "white". If set to NULL, color
 are not adjusted for those chains. To color heterodimer, color the first chain with other_color as "white" and

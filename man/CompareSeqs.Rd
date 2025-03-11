@@ -9,7 +9,8 @@ CompareSeqs(
   chain,
   seq,
   pos.only = TRUE,
-  penalty = c("blastp", "pyETv")
+  penalty = c("blastp", "pyETv"),
+  pdb_format = c("pdb", "pdbx")
 )
 }
 \arguments{
