@@ -8,6 +8,9 @@ Color_Variants_AlphaFold(
   variants_case,
   variants_ctrl = NULL,
   prot_id,
+  color_type = c("ET", "red_white", "red_white_blue", "gray_scale", "rev_EA_bin",
+    "red_yellow_green"),
+  additional_pymol_cmds = NULL,
   pml_output,
   output_format = c("pml", "pse")
 )
@@ -22,6 +25,12 @@ range of (0, 100].}
 
 \item{prot_id}{Protein identification. Use full ENSP for human proteins, eg. ENSP00000388638.1.
 Use locus tag for E. coli MG1655 proteins, eg. b4112.}
+
+\item{color_type}{The type of color range to use. Available selections: "ET",
+"red_white", "red_white_blue", "gray_scale", "rev_EA_bin", "red_yellow_green". The colors
+will be used for ET. EA will be colored using the reverse of this coloring.}
+
+\item{additional_pymol_cmds}{Additional pymol commands to append to the pymol script. Store them in a vector.}
 
 \item{pml_output}{Path to store the pymol command file.}
 

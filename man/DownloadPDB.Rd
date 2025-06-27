@@ -2,14 +2,16 @@
 % Please edit documentation in R/DownloadPDB.R
 \name{DownloadPDB}
 \alias{DownloadPDB}
-\title{Rewrite PDB file according to linear sequence}
+\title{Download PDB file from rcsb}
 \usage{
-DownloadPDB(pdb, out_dir = ".")
+DownloadPDB(pdb, out_dir = ".", pdb_format = c("pdb", "pdbx"))
 }
 \arguments{
 \item{pdb}{The pdb id that needs to be downloaded}
 
 \item{out_dir}{The directory that the pdb will be saved}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 }
 \value{
 a message reporting the pdb is downloaded

@@ -6,11 +6,12 @@
 #' for precalculated ET scores from EA VEP output.
 #' @param ET_file Path to ET file. If "ENSP" is used in ET_format, provide ENSP id here, including version.
 #' @param color_type The type of color range to use. Available selections: "ET",
-#' "red_white", "red_white_blue", and "gray_scale".
+#' "red_white", "red_white_blue", "gray_scale", "rev_EA_bin", "red_yellow_green".
 #' @param coverage_cutoff Value between (0,1]. Only residue below this cutoff will be colored.
-#' @param other_color Color for the remaining chain. Default "white". If set to NULL, color
+#' @param remaining_color Color for the remaining chain. Default "white". If set to NULL, color
 #' are not adjusted for those chains. To color heterodimer, color the first chain with other_color as "white" and
 #' save as pse. Then color the second chain using the pse file with other_color = NULL to retain the first chain color.
+#' @param additional_pymol_cmds Additional pymol commands to append to the pymol script. Store them in a vector.
 #' @param pml_output Path to store the pymol command file.
 #' @param output_file Path to write the output pymol file.
 #' @param output_format Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
@@ -28,8 +29,10 @@
 #'              ET_file = "ENSP00000000442.6", color_type = "ET", coverage_cutoff = 0.3,
 #'              output_format = "pml", output_file = "test.pml")
 ColorPDBByET <- function(pdb_file, chain, ET_format = c("EA", "UET", "ENSP"),
-                         ET_file, color_type = c("ET", "red_white", "red_white_blue", "gray_scale"),
+                         ET_file, color_type = c("ET", "red_white", "red_white_blue", "gray_scale", "rev_EA_bin",
+                                                 "red_yellow_green"),
                          coverage_cutoff = 1, remaining_color = "white",
+                         additional_pymol_cmds = NULL,
                          output_file, output_format = c("pml", "pse"),
                          pdb_format = c("pdb", "pdbx")) {
   ET_format <- match.arg(ET_format)
@@ -78,6 +81,9 @@ ColorPDBByET <- function(pdb_file, chain, ET_format = c("EA", "UET", "ENSP"),
     aligned_count <- sum(align_df_filter_chain$seq.AA.align == align_df_filter_chain$pdb.AA.align)
     print(glue::glue("{nrow(align_df_filter_chain)}/{nrow(ET)} = {round(nrow(align_df_filter_chain)/nrow(ET),3)*100}% of the positions in ET aligned to chain {i}"))
     print(glue::glue("{aligned_count}/{nrow(align_df_filter_chain)} = {round(aligned_count/nrow(align_df_filter_chain),3)*100}% of the aligned positions in chain {i} are exact match"))
+  }
+  if (!is.null(additional_pymol_cmds)) {
+    pymol_cmd <- c(pymol_cmd, additional_pymol_cmds)
   }
 
   if (output_format == "pml") {

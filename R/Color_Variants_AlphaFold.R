@@ -5,9 +5,13 @@
 #' be used in SUB, eg. L10P. EA can be replaced with other values, but have to scale to the
 #' range of (0, 100].
 #' @param variants_ctrl A dataframe that stores the mutations in the controls in target gene.
+#' @param color_type The type of color range to use. Available selections: "ET",
+#' "red_white", "red_white_blue", "gray_scale", "rev_EA_bin", "red_yellow_green". The colors
+#' will be used for ET. EA will be colored using the reverse of this coloring.
 #' @param pml_output Path to store the pymol command file.
 #' @param prot_id Protein identification. Use full ENSP for human proteins, eg. ENSP00000388638.1.
 #' Use locus tag for E. coli MG1655 proteins, eg. b4112.
+#' @param additional_pymol_cmds Additional pymol commands to append to the pymol script. Store them in a vector.
 #' @param output_format Output pymol script (pml) or pymol session (pse). Pse output requires pymol to
 #' be accessble from terminal with "pymol".
 #' @return A tibble that contains the coloring information. The pml file will
@@ -17,8 +21,14 @@
 #' @export
 
 Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
-                                     prot_id, pml_output, output_format = c("pml", "pse")) {
+                                     prot_id,
+                                     color_type = c("ET", "red_white", "red_white_blue", "gray_scale", "rev_EA_bin",
+                                                    "red_yellow_green"),
+                                     additional_pymol_cmds = NULL,
+                                     pml_output, output_format = c("pml", "pse")) {
   output_format <- match.arg(output_format)
+  color_type <- match.arg(color_type)
+
   if ((sum(c("SUB", "EA") %in% names(variants_case))) < 2) {
     stop("variants_case df should contain these cols: SUB, EA")
   }
@@ -82,10 +92,10 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
     mutate(EA_case = ifelse(EA_case == 0, 0.01, EA_case)) %>%
     mutate(EA_ctrl = ifelse(EA_ctrl == 0, 0.01, EA_ctrl)) %>%
     dplyr::rename(ET = coverage) %>%
-    dplyr::mutate(ET_color = GetColor(ET, lower_bound = 0, upper_bound = 100, color = "ET"),
+    dplyr::mutate(ET_color = GetColor(ET, lower_bound = 0, upper_bound = 100, color = color_type),
                   pLDDT_color = GetColor(pLDDT, lower_bound = 0, upper_bound = 100, color = "alphafold"),
-                  EA_case_color = GetColor((100.0001-EA_case), lower_bound = 0, upper_bound = 100, color = "ET"),
-                  EA_ctrl_color = GetColor((100.0001-EA_ctrl), lower_bound = 0, upper_bound = 100, color = "ET")
+                  EA_case_color = GetColor((100.0001-EA_case), lower_bound = 0, upper_bound = 100, color = color_type),
+                  EA_ctrl_color = GetColor((100.0001-EA_ctrl), lower_bound = 0, upper_bound = 100, color = color_type)
     ) %>%
     dplyr::mutate(dplyr::across(dplyr::ends_with("color"),
                                 ~stringr::str_replace(., "#", "0x"))) %>%
@@ -120,6 +130,9 @@ Color_Variants_AlphaFold <- function(variants_case, variants_ctrl = NULL,
                    "delete EA_ctrl")
     pymol_color_df <- pymol_color_df %>%
       mutate(EA_ctrl = NA, EA_ctrl_color = NA)
+  }
+  if (!is.null(additional_pymol_cmds)) {
+    pymol_cmd <- c(pymol_cmd, additional_pymol_cmds)
   }
   if (output_format == "pml") {
     writeLines(pymol_cmd, con = pml_output)

@@ -38,7 +38,8 @@ PymolColorChainByResidue <- function(chain, position, color, object = NULL) {
 #' @param object A given object in the pymol session that needs to be colored. If is
 #' NULL, then all object in the pymol session will be colored.
 #' @param color_type The type of color range to use. Available selections: "ET",
-#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_scale", "EA_bin".
+#' "red_white", "red_white_blue", "white_red", "white_blue, "alphafold", "gray_scale", "EA_bin", "rev_EA_bin",
+#' "red_yellow_green".
 #' @param coverage_cutoff Only residue below this cutoff will be colored.
 #' @return A string vector with pymol commands
 #' @description Produce pymol commands to color residues in given chains using ET coverage. This function should

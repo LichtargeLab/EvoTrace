@@ -9,9 +9,11 @@ ColorPDBByET(
   chain,
   ET_format = c("EA", "UET", "ENSP"),
   ET_file,
-  color_type = c("ET", "red_white", "red_white_blue", "gray_scale"),
+  color_type = c("ET", "red_white", "red_white_blue", "gray_scale", "rev_EA_bin",
+    "red_yellow_green"),
   coverage_cutoff = 1,
   remaining_color = "white",
+  additional_pymol_cmds = NULL,
   output_file,
   output_format = c("pml", "pse"),
   pdb_format = c("pdb", "pdbx")
@@ -28,9 +30,15 @@ for precalculated ET scores from EA VEP output.}
 \item{ET_file}{Path to ET file. If "ENSP" is used in ET_format, provide ENSP id here, including version.}
 
 \item{color_type}{The type of color range to use. Available selections: "ET",
-"red_white", "red_white_blue", and "gray_scale".}
+"red_white", "red_white_blue", "gray_scale", "rev_EA_bin", "red_yellow_green".}
 
 \item{coverage_cutoff}{Value between (0,1]. Only residue below this cutoff will be colored.}
+
+\item{remaining_color}{Color for the remaining chain. Default "white". If set to NULL, color
+are not adjusted for those chains. To color heterodimer, color the first chain with other_color as "white" and
+save as pse. Then color the second chain using the pse file with other_color = NULL to retain the first chain color.}
+
+\item{additional_pymol_cmds}{Additional pymol commands to append to the pymol script. Store them in a vector.}
 
 \item{output_file}{Path to write the output pymol file.}
 
@@ -38,10 +46,6 @@ for precalculated ET scores from EA VEP output.}
 be accessible from terminal with "pymol".}
 
 \item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
-
-\item{other_color}{Color for the remaining chain. Default "white". If set to NULL, color
-are not adjusted for those chains. To color heterodimer, color the first chain with other_color as "white" and
-save as pse. Then color the second chain using the pse file with other_color = NULL to retain the first chain color.}
 
 \item{pml_output}{Path to store the pymol command file.}
 }
