@@ -17,5 +17,6 @@ stored as the names. If a dataframe is returned, then ids are stored in id colum
 sequences are stored in seq column.
 }
 \description{
-Read fasta file
+Read files with fasta like format. The function allows most characters (no space)
+in the sequence and preserves upper/lower cases.
 }

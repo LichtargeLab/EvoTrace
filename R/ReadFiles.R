@@ -49,17 +49,44 @@ ReadET <- function(ET_file, ET_format = c("EA", "UET")) {
 #' @return If vector is returned, then all sequences are stored in a vector, ids are
 #' stored as the names. If a dataframe is returned, then ids are stored in id column and
 #' sequences are stored in seq column.
-#' @description Read fasta file
+#' @description Read files with fasta like format. The function allows most characters (no space)
+#' in the sequence and preserves upper/lower cases.
 #' @export
 ReadFasta <- function(fasta_file, output_type = c("vector", "df")) {
-  all.seq <- Biostrings::readAAStringSet(fasta_file)
   output_type <- match.arg(output_type)
+
+  fasta_lines <- readLines(fasta_file, warn = FALSE)
+  if (length(fasta_lines) == 0) stop("File is empty.")
+
+  fasta_lines <- trimws(fasta_lines)
+  fasta_lines <- fasta_lines[nchar(fasta_lines) > 0]
+
+  header_positions <- which(substr(fasta_lines, 1, 1) == ">")
+  if (length(header_positions) == 0) stop("No FASTA headers ('>') found.")
+  header_positions <- c(header_positions, length(fasta_lines) + 1)
+
+  id_vec  <- character(length(header_positions) - 1)
+  seq_vec <- character(length(header_positions) - 1)
+
+  for (i in seq_len(length(header_positions) - 1)) {
+    start_idx <- header_positions[i]
+    end_idx   <- header_positions[i + 1] - 1
+
+    seq_id <- sub("^>", "", fasta_lines[start_idx])  # remove '>' before ID
+
+    seq_lines <- fasta_lines[(start_idx + 1):end_idx]
+    seq_combined <- gsub("\\s+", "", paste(seq_lines, collapse = ""))
+
+    id_vec[i]  <- seq_id
+    seq_vec[i] <- seq_combined
+  }
+
   if (output_type == "vector") {
-    output <- as.character(all.seq)
-    names(output) <- names(all.seq)
+    output <- seq_vec
+    names(output) <- id_vec
   } else {
-    output <- data.frame(id = names(all.seq),
-                         seq = as.character(all.seq),
+    output <- data.frame(id = id_vec,
+                         seq = seq_vec,
                          stringsAsFactors = FALSE)
   }
   return(output)
