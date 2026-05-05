@@ -23,18 +23,18 @@ CompareLinearSeqs <- function(seq1, seq2, pos.only = TRUE, penalty = c("blastp",
   }
 
   if (penalty == "DNA") {
-    mat <- Biostrings::nucleotideSubstitutionMatrix(match = 1, mismatch = -2, baseOnly = TRUE)
-    alignment <- Biostrings::pairwiseAlignment(pattern = seq1, subject = seq2,
+    mat <- pwalign::nucleotideSubstitutionMatrix(match = 1, mismatch = -2, baseOnly = TRUE)
+    alignment <- pwalign::pairwiseAlignment(pattern = seq1, subject = seq2,
                                                substitutionMatrix = mat,
                                                gapOpening = gap.open, gapExtension = gap.extend)
   } else {
-    alignment <- Biostrings::pairwiseAlignment(pattern = seq1, subject = seq2,
+    alignment <- pwalign::pairwiseAlignment(pattern = seq1, subject = seq2,
                                                substitutionMatrix = "BLOSUM62",
                                                gapOpening = gap.open, gapExtension = gap.extend)
   }
 
-  align.df <- c(Biostrings::alignedPattern(alignment),
-                Biostrings::alignedSubject(alignment)) %>%
+  align.df <- c(pwalign::alignedPattern(alignment),
+                pwalign::alignedSubject(alignment)) %>%
     as.character() %>%
     str_split(., pattern = "", simplify = TRUE) %>%
     t() %>%

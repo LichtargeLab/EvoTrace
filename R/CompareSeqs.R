@@ -31,12 +31,12 @@ CompareSeqs <- function(pdb_file, chain, seq,
     gap.open = 10
     gap.extend = 0.5
   }
-  alignment <- Biostrings::pairwiseAlignment(pattern = pdb.str, subject = seq,
+  alignment <- pwalign::pairwiseAlignment(pattern = pdb.str, subject = seq,
                                              substitutionMatrix = "BLOSUM62",
                                              gapOpening = gap.open, gapExtension = gap.extend)
 
-  align.df <- c(Biostrings::alignedPattern(alignment),
-                Biostrings::alignedSubject(alignment)) %>%
+  align.df <- c(pwalign::alignedPattern(alignment),
+                pwalign::alignedSubject(alignment)) %>%
     as.character() %>%
     str_split(., pattern = "", simplify = TRUE) %>%
     t() %>%

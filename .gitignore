@@ -7,3 +7,5 @@ EvoTrace.Rproj
 inst/doc
 /doc/
 /Meta/
+/test/
+/dev/
