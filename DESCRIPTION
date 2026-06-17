@@ -1,11 +1,14 @@
 Package: EvoTrace
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
+Title: Analyze and Visualize Evolutionary Trace Scores on Protein Structures
+Version: 0.1.1
 Author: Chen Wang
 Maintainer: Chen Wang <chen.wang@bcm.edu>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Tools for mapping evolutionary trace scores, variants, and residue-level
+    annotations onto protein sequences and structures. Includes helpers for reading
+    evolutionary trace outputs, aligning sequence and structure coordinates, computing
+    structural distance and smoothness metrics, generating PyMOL coloring commands,
+    and creating protein variant visualizations.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,7 +26,9 @@ Imports:
     glue,
     gdata,
     egg,
-    pwalign
+    pwalign,
+    tibble,
+    xml2
 Suggests: 
     knitr,
     rmarkdown
