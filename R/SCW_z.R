@@ -5,13 +5,16 @@
 #' @param dist_cutoff the distance cutoff that consider two atoms are adjacent
 #' @param resi a vector of residues numbers that are included in SCW bg calculation.
 #' If NULL, then all residues in that chain is used.
+#' @param pdb_format Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.
 #' @return a list with parameters that are needed for SCW z scores calculation
 #' @description Calculates the required stats for w_hat, w^2_hat calculation in
 #' SCW z scores. Residues are consider adjacent when any of their heavy atoms are
 #' within the cutoff range. The output is feed into ComputeSCWzscore function for
 #' z score calculation.
 #' @export
-GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
+GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL,
+                            pdb_format = c("pdb", "pdbx")) {
+  pdb_format <- match.arg(pdb_format)
   # This computes class counts used in calculation of
   # w_hat, w^2_hat in SCW z score.
   # It will produce values for both unbiased (1), biased (j-i) and
@@ -22,7 +25,7 @@ GetSCWBackgound <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL) {
   #   dist_cutoff: the cutoff to determine adjacency of two residues in the structure
   # output:
   #   list contains the distance df and the class count df
-  cord <- GetCoordinates(pdb_file, chain, CA_only = FALSE)
+  cord <- GetCoordinates(pdb_file, chain, CA_only = FALSE, pdb_format = pdb_format)
   if(!is.null(resi)) {
     cord <- cord %>%
       filter(POS %in% resi)
@@ -165,20 +168,24 @@ ComputeSCWzscore_list <- function(SCW_background, resi_list) {
 #' in the pdb structure are used to calculate this background. Should set to TRUE when there is
 #' a large insertion in the pdb comparing to the ET sequence. Adjust_gap only works when using
 #' pdb_file/chain as input.
+#' @param pdb_format Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.
 #' @return a df with biased and unbiased SCW z scores.
 #' @description This function calculates the biased and unbiased SCW z scores
 #' for top residues in the ET ranks file. Can use pdb_file/chain or pre calculated SCW_background
 #' as input.
 #' @export
 ET_SCWzscore <- function(pdb_file = NULL, chain = NULL, SCW_background = NULL, ET_file,
-                         coverage = 0.3, adjust_gap = FALSE) {
+                         coverage = 0.3, adjust_gap = FALSE,
+                         pdb_format = c("pdb", "pdbx")) {
+  pdb_format <- match.arg(pdb_format)
   ET <- ReadET(ET_file)
   ET_seq <- paste0(ET$AA, collapse = "")
   # When pdb file is not provided, use residue numbers in the ET output to map to strucutre,
   # if pdb file is provided, pdb seq is aligned with ET seq to map the ET top residues to
   # structure.
   if (!is.null(pdb_file)) {
-    resi_map <- CompareSeqs(pdb_file, chain, ET_seq, pos.only = TRUE)
+    resi_map <- CompareSeqs(pdb_file, chain, ET_seq, pos.only = TRUE,
+                            pdb_format = pdb_format)
     resi_select <- ET %>%
       left_join(dplyr::rename(resi_map, POS = AA.POS.seq, pdb.POS = AA.POS.pdb), by = "POS")
   } else {
@@ -192,9 +199,12 @@ ET_SCWzscore <- function(pdb_file = NULL, chain = NULL, SCW_background = NULL, E
       stop("Provide either pdb_file/chain or SCW_background")
     }
     if (adjust_gap == TRUE) {
-      scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain, resi = resi_map$AA.POS.pdb)
+      scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain,
+                                resi = resi_map$AA.POS.pdb,
+                                pdb_format = pdb_format)
     } else {
-      scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain)
+      scw_bg <- GetSCWBackgound(pdb_file = pdb_file, chain = chain,
+                                pdb_format = pdb_format)
     }
   }
 
@@ -219,6 +229,7 @@ ET_SCWzscore <- function(pdb_file = NULL, chain = NULL, SCW_background = NULL, E
 #' @param temp_dir temp dir to store intermediate files. Default is to create a temp dir
 #' in the current working directory.
 #' @param cores number of cores to parallel computing.
+#' @param pdb_format Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.
 #' @return a list with parameters that are needed for SCW z scores calculation
 #' @description Calculates the required stats for w_hat, w^2_hat calculation in
 #' SCW z scores. Residues are consider adjacent when any of their heavy atoms are
@@ -228,7 +239,9 @@ ET_SCWzscore <- function(pdb_file = NULL, chain = NULL, SCW_background = NULL, E
 #' @export
 GetSCWBackgound_reduce_memory <- function(pdb_file, chain, dist_cutoff = 4, resi = NULL,
                                           temp_dir = "temp",
-                                          cores = 1) {
+                                          cores = 1,
+                                          pdb_format = c("pdb", "pdbx")) {
+  pdb_format <- match.arg(pdb_format)
   # This computes class counts used in calculation of
   # w_hat, w^2_hat in SCW z score.
   # It will produce values for both unbiased (1), biased (j-i) and
@@ -255,7 +268,7 @@ GetSCWBackgound_reduce_memory <- function(pdb_file, chain, dist_cutoff = 4, resi
   }
 
 
-  cord <- GetCoordinates(pdb_file, chain, CA_only = FALSE)
+  cord <- GetCoordinates(pdb_file, chain, CA_only = FALSE, pdb_format = pdb_format)
   if(!is.null(resi)) {
     cord <- cord %>%
       filter(POS %in% resi)
@@ -402,5 +415,4 @@ GetSCWBackgound_reduce_memory <- function(pdb_file, chain, dist_cutoff = 4, resi
               "pdb_length" = pdb_length,
               "dist_cutoff" = dist_cutoff))
 }
-
 

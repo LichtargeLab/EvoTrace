@@ -4,7 +4,13 @@
 \alias{GetSCWBackgound}
 \title{Compute the background stats for SCW z score calculation}
 \usage{
-GetSCWBackgound(pdb_file, chain, dist_cutoff = 4, resi = NULL)
+GetSCWBackgound(
+  pdb_file,
+  chain,
+  dist_cutoff = 4,
+  resi = NULL,
+  pdb_format = c("pdb", "pdbx")
+)
 }
 \arguments{
 \item{pdb_file}{path to pdb file}
@@ -15,6 +21,8 @@ GetSCWBackgound(pdb_file, chain, dist_cutoff = 4, resi = NULL)
 
 \item{resi}{a vector of residues numbers that are included in SCW bg calculation.
 If NULL, then all residues in that chain is used.}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 }
 \value{
 a list with parameters that are needed for SCW z scores calculation

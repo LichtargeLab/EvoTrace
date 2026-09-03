@@ -24,6 +24,8 @@ CompareSeqs(
 the linear sequence are returned.}
 
 \item{penalty}{Gap penalties used for the pairwise alignment.}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 }
 \value{
 A tibble that contains the matching information of the pdb sequence and

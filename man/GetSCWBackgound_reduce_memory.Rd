@@ -10,7 +10,8 @@ GetSCWBackgound_reduce_memory(
   dist_cutoff = 4,
   resi = NULL,
   temp_dir = "temp",
-  cores = 1
+  cores = 1,
+  pdb_format = c("pdb", "pdbx")
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ If NULL, then all residues in that chain is used.}
 in the current working directory.}
 
 \item{cores}{number of cores to parallel computing.}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 }
 \value{
 a list with parameters that are needed for SCW z scores calculation

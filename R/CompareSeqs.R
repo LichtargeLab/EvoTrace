@@ -6,6 +6,7 @@
 #' @param pos.only If TRUE, then only matched positions between the pdb sequence and
 #' the linear sequence are returned.
 #' @param penalty Gap penalties used for the pairwise alignment.
+#' @param pdb_format Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.
 #' @return A tibble that contains the matching information of the pdb sequence and
 #' linear sequence.
 #' @description Sequence from pdb_file is extracted and compared (aligned) to linear

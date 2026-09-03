@@ -10,7 +10,8 @@ ET_SCWzscore(
   SCW_background = NULL,
   ET_file,
   coverage = 0.3,
-  adjust_gap = FALSE
+  adjust_gap = FALSE,
+  pdb_format = c("pdb", "pdbx")
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ in the pdb structure are used to calculate SCW background. When TRUE, only align
 in the pdb structure are used to calculate this background. Should set to TRUE when there is
 a large insertion in the pdb comparing to the ET sequence. Adjust_gap only works when using
 pdb_file/chain as input.}
+
+\item{pdb_format}{Use "pdb" if the input is traditional pdb. Use "pdbx" for PDBx/mmCIF.}
 }
 \value{
 a df with biased and unbiased SCW z scores.
