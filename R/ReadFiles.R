@@ -92,6 +92,97 @@ ReadFasta <- function(fasta_file, output_type = c("vector", "df")) {
   return(output)
 }
 
+#' Read MSF multiple sequence alignment file
+#'
+#' @param msf_file Path to MSF file
+#' @param output_type vector or df
+#' @return If vector is returned, then all sequences are stored in a vector, ids are
+#' stored as the names. If a dataframe is returned, then ids are stored in id column and
+#' sequences are stored in seq column.
+#' @description Read a GCG MSF multiple sequence alignment file. Sequence blocks are
+#' concatenated by ID and periods used as gap characters are converted to hyphens.
+#' @export
+ReadMSF <- function(msf_file, output_type = c("vector", "df")) {
+  output_type <- match.arg(output_type)
+
+  msf_lines <- readLines(msf_file, warn = FALSE)
+  if (length(msf_lines) == 0) stop("File is empty.")
+
+  section_positions <- which(grepl("^\\s*//\\s*$", msf_lines))
+  if (length(section_positions) == 0) {
+    stop("No MSF sequence section ('//') found.")
+  }
+
+  section_start <- section_positions[1]
+  if (section_start < length(msf_lines)) {
+    sequence_lines <- msf_lines[seq.int(section_start + 1L, length(msf_lines))]
+    sequence_lines <- sequence_lines[nzchar(trimws(sequence_lines))]
+  } else {
+    sequence_lines <- character(0)
+  }
+
+  # Sequence names are declared in the MSF header. Using them here prevents
+  # comments or other non-sequence lines after the // marker from being read.
+  header_lines <- if (section_start > 1L) {
+    msf_lines[seq_len(section_start - 1L)]
+  } else {
+    character(0)
+  }
+  header_name_lines <- header_lines[
+    grepl("^\\s*Name\\s*:", header_lines, ignore.case = TRUE)
+  ]
+  header_ids <- sub("^\\s*Name\\s*:\\s*", "", header_name_lines,
+                    ignore.case = TRUE)
+  header_ids <- sub("\\s+.*$", "", trimws(header_ids))
+  header_ids <- unique(header_ids[nzchar(header_ids)])
+
+  id_vec <- character(0)
+  sequence_parts <- list()
+
+  for (line in sequence_lines) {
+    fields <- strsplit(trimws(line), "\\s+")[[1]]
+    if (length(fields) < 2L) next
+
+    seq_id <- fields[1]
+    if (length(header_ids) > 0L && !(seq_id %in% header_ids)) next
+
+    sequence_fields <- fields[-1]
+    # Some MSF writers include an alignment position before or after each line.
+    if (length(sequence_fields) > 1L &&
+        grepl("^[[:digit:]]+$", sequence_fields[1])) {
+      sequence_fields <- sequence_fields[-1]
+    }
+    if (length(sequence_fields) > 1L &&
+        grepl("^[[:digit:]]+$", sequence_fields[length(sequence_fields)])) {
+      sequence_fields <- sequence_fields[-length(sequence_fields)]
+    }
+    sequence_chunk <- paste0(sequence_fields, collapse = "")
+    if (!nzchar(sequence_chunk)) next
+
+    sequence_chunk <- chartr(".", "-", sequence_chunk)
+    if (!(seq_id %in% id_vec)) {
+      id_vec <- c(id_vec, seq_id)
+      sequence_parts[[seq_id]] <- sequence_chunk
+    } else {
+      sequence_parts[[seq_id]] <- paste0(sequence_parts[[seq_id]], sequence_chunk)
+    }
+  }
+
+  if (length(id_vec) == 0) stop("No sequences found in MSF file.")
+
+  seq_vec <- vapply(id_vec, function(id) sequence_parts[[id]], character(1))
+  names(seq_vec) <- id_vec
+
+  if (output_type == "vector") {
+    output <- seq_vec
+  } else {
+    output <- data.frame(id = id_vec,
+                         seq = unname(seq_vec),
+                         stringsAsFactors = FALSE)
+  }
+  return(output)
+}
+
 #' Read Clustal MSA file
 #'
 #' @param clustal_path Path to MSA file
